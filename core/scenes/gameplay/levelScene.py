@@ -65,8 +65,13 @@ class LevelScene(GameMixin):
                 spring = Spring(obstacle["x"], obstacle["y"])
                 self.springs.append(spring)
             elif obstacle["type"] == "teleporterPair":
-                teleporter1 = Teleporter(obstacle["x1"], obstacle["y1"], obstacle["x2"], obstacle["y2"])
-                teleporter2 = Teleporter(obstacle["x2"], obstacle["y2"], obstacle["x1"], obstacle["y1"])
+                # 创建配对传送门，使用配对ID区分不同的传送门对
+                pair_id = len(self.teleporters)  # 每个传送门对使用不同的ID
+                teleporter1 = Teleporter(obstacle["x1"], obstacle["y1"], obstacle["x2"], obstacle["y2"], pair_id=pair_id)
+                teleporter2 = Teleporter(obstacle["x2"], obstacle["y2"], obstacle["x1"], obstacle["y1"], pair_id=pair_id)
+                # 设置配对引用
+                teleporter1.pair_teleporter = teleporter2
+                teleporter2.pair_teleporter = teleporter1
                 self.teleporters.append([teleporter1, teleporter2])
 
     def _obj_update(self, dt):

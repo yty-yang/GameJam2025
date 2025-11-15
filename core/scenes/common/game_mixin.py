@@ -122,19 +122,22 @@ class GameMixin(Scene):
                     self.shake_timer = 5
 
         if hasattr(self, "teleporters"):
-            for teleporter_pair in self.teleporters[:]:  # 用切片复制列表
-                tele_target = False
+            teleported = False  # 防止同一帧内多次传送
+            for teleporter_pair in self.teleporters:
+                if teleported:
+                    break
                 for teleporter in teleporter_pair:
                     teleporter.update(dt)
-                    tele_target = teleporter.check_collision(self.ball)
-                    if tele_target:
-                        # 传送
-                        self.ball.x, self.ball.y = tele_target
-                        self.ball.vx *= 0.5
-                        self.ball.vy *= 0.5
-                        self.shake_timer = 2
-                        self.teleporters.remove(teleporter_pair)
-                        break
+                    if not teleported:
+                        tele_target = teleporter.check_collision(self.ball)
+                        if tele_target:
+                            # 传送
+                            self.ball.x, self.ball.y = tele_target
+                            self.ball.vx *= 0.5
+                            self.ball.vy *= 0.5
+                            self.shake_timer = 2
+                            teleported = True
+                            break  # 只传送一次，不删除传送门对，允许重复使用
 
         if hasattr(self, "coins"):
             for coin in self.coins:
@@ -251,9 +254,12 @@ class GameMixin(Scene):
             platform.draw(screen, self.camera)
         for spring in self.springs:
             spring.draw(screen, self.camera)
-        for t_pair in self.teleporters:
-            for teleporter in t_pair:
-                teleporter.draw(screen, self.camera)
+        
+        # 绘制传送门（内部已包含箭头指示）
+        if hasattr(self, "teleporters"):
+            for t_pair in self.teleporters:
+                for teleporter in t_pair:
+                    teleporter.draw(screen, self.camera)
 
         # 绘制金币
         for coin in self.coins:

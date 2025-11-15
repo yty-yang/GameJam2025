@@ -54,8 +54,13 @@ class EndlessScene(GameMixin):
             tele1_y = self.camera.y - SCREEN_HEIGHT * 0.5 - random.randint(150, 300)
             tele2_x = random.randint(100, SCREEN_WIDTH - 100)
             tele2_y = tele1_y - random.randint(200, 400)
-            teleporter1 = Teleporter(tele1_x, tele1_y, tele2_x, tele2_y)
-            teleporter2 = Teleporter(tele2_x, tele2_y, tele1_x, tele1_y)
+            # 创建配对传送门，使用配对ID区分不同的传送门对
+            pair_id = len(self.teleporters)  # 每个传送门对使用不同的ID
+            teleporter1 = Teleporter(tele1_x, tele1_y, tele2_x, tele2_y, pair_id=pair_id)
+            teleporter2 = Teleporter(tele2_x, tele2_y, tele1_x, tele1_y, pair_id=pair_id)
+            # 设置配对引用
+            teleporter1.pair_teleporter = teleporter2
+            teleporter2.pair_teleporter = teleporter1
             self.teleporters.append([teleporter1, teleporter2])
 
     def _obj_update(self, dt):
