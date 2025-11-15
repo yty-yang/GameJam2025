@@ -73,22 +73,32 @@ def check_haptic():
 
 
 def shake_apply(current_scene, screen, haptic):
-    # 如果 Scene 有 shake，就用 shake
-    dest = current_scene.get_shake_offset() if hasattr(current_scene, "get_shake_offset") else (0, 0)
-    pygame.display.get_surface().blit(screen, dest)
-    if haptic:
-        dx, dy = dest
-        magnitude = (dx ** 2 + dy ** 2) ** 0.5  # 偏移大小
-        max_magnitude = 20  # 根据你的屏幕 shake 最大偏移调整
-        level = min(magnitude / max_magnitude, 1.0)  # 0~1
-        length = int(100 + 400 * (magnitude / max_magnitude))  # 最短 100ms，最长 500ms
+    # 创建一个比屏幕大一些的缓冲区，避免抖动露边
+    EXTRA = 40
+    buffer_surface = pygame.Surface((SCREEN_WIDTH + EXTRA, SCREEN_HEIGHT + EXTRA))
 
-        effect_id = haptic.new_effect(haptic_module.Effect(
-            type=haptic_module.Constant,
-            length=length,
-            level=level
-        ))
-        haptic.run_effect(effect_id)
+    # 清空缓冲区并绘制场景（场景会按自身坐标系画，不受抖动影响）
+    buffer_surface.fill((0, 0, 0))
+    current_scene.draw(buffer_surface)
+
+    # 获取摇动偏移
+    dx, dy = current_scene.get_shake_offset() if hasattr(current_scene, "get_shake_offset") else (0, 0)
+
+    # 计算在 buffer 中应裁剪的区域
+    crop_rect = pygame.Rect(
+        EXTRA // 2 + dx,
+        EXTRA // 2 + dy,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT
+    )
+
+    # 将裁切好的图像贴到屏幕
+    screen.blit(buffer_surface, (0, 0), crop_rect)
+
+    magnitude = (dx ** 2 + dy ** 2) ** 0.5
+    max_magnitude = 20
+    level = min(magnitude / max_magnitude, 1.0)
+    length = int(100 + 400 * (magnitude / max_magnitude))
 
 
 def scene_switch(current_scene):
