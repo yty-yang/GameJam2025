@@ -73,7 +73,7 @@ def check_haptic():
     return haptic
 
 
-def shake_apply(current_scene, screen, haptic):
+def shake_apply(current_scene, screen):
     # 创建一个比屏幕大一些的缓冲区，避免抖动露边
     EXTRA = 40
     buffer_surface = pygame.Surface((SCREEN_WIDTH + EXTRA, SCREEN_HEIGHT + EXTRA))
@@ -129,7 +129,7 @@ def main():
         (SCREEN_WIDTH, SCREEN_HEIGHT),
         pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.SCALED
     )
-    pygame.display.set_caption("GameJam Demo")
+    pygame.display.set_caption("Cold Ice Beer")
     clock = pygame.time.Clock()
 
     game_state_load()
@@ -158,7 +158,7 @@ def main():
         current_scene.draw(screen)
 
         # screen shake apply
-        shake_apply(current_scene, screen, haptic)
+        shake_apply(current_scene, screen)
 
         pygame.display.flip()
 

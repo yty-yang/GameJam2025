@@ -1,10 +1,12 @@
+from pathlib import Path
+
 import pygame
 
 from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
 
 from core.ui import UI
-from utils.settings import SCREEN_WIDTH
+from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class MenuScene(Scene, menu_nav.MenuNavigationMixin):
@@ -14,6 +16,17 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         self.font = pygame.font.SysFont(None, 48)
         self.options = ["Start Game", "Help", "Setting", "Credits", "Quit"]
         self.selected_index = 0
+
+        # 加载背景图
+        project_root = Path(__file__).resolve().parents[3]   # 到 root/
+        bg_path = project_root / "data" / "pictures" / "menu_picture.jpg"
+        self.background = pygame.image.load(bg_path).convert()
+
+        # 如果需要拉伸到全屏：
+        self.background = pygame.transform.scale(
+            self.background,
+            (SCREEN_WIDTH, SCREEN_HEIGHT)
+        )
 
     def _select_option(self):
         if self.selected_index == 0:  # Start Game
@@ -43,7 +56,8 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         pass  # 菜单没有动画的话可以空着
 
     def draw(self, screen):
-        screen.fill((30, 30, 30))
+        # 绘制背景
+        screen.blit(self.background, (0, 0))
 
         ui = UI()
         ui.menu_ui(screen)
