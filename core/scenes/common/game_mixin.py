@@ -83,13 +83,46 @@ class GameMixin(Scene):
         self.game_over = False
         self.shake_timer = 0
         
-        # 加载游戏机背景图片
+        # 加载游戏机背景图片（动画序列）
         project_root = Path(__file__).resolve().parents[3]
-        game_machine_path = project_root / "data" / "pictures" / "game_machine.png"
+        game_machine_dir = project_root / "data" / "pictures" / "game_machine"
+        
+        self.game_machine_frames = []
+        self.animation_frame = 0.0
+        self.animation_speed = 0.15  # 动画速度（每帧增加的帧数）
+        
         try:
-            self.game_machine_bg = pygame.image.load(str(game_machine_path)).convert_alpha()
-            # 缩放游戏机背景到屏幕大小
-            self.game_machine_bg = pygame.transform.scale(self.game_machine_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            # 加载所有动画帧（0-8）
+            for i in range(9):
+                # 尝试两种文件名格式：game_machine-0.png 和 game_machine_0.png
+                frame_path1 = game_machine_dir / f"game_machine-{i}.png"
+                frame_path2 = game_machine_dir / f"game_machine_{i}.png"
+                
+                if frame_path1.exists():
+                    frame = pygame.image.load(str(frame_path1)).convert_alpha()
+                elif frame_path2.exists():
+                    frame = pygame.image.load(str(frame_path2)).convert_alpha()
+                else:
+                    print(f"警告：找不到游戏机背景帧 {i}")
+                    continue
+                
+                # 缩放背景到屏幕大小
+                frame = pygame.transform.scale(frame, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                self.game_machine_frames.append(frame)
+            
+            if len(self.game_machine_frames) == 0:
+                # 如果没有找到动画帧，尝试加载单个图片作为后备
+                game_machine_path = project_root / "data" / "pictures" / "game_machine.png"
+                if game_machine_path.exists():
+                    self.game_machine_bg = pygame.image.load(str(game_machine_path)).convert_alpha()
+                    self.game_machine_bg = pygame.transform.scale(self.game_machine_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                    self.game_machine_frames = None
+                else:
+                    self.game_machine_bg = None
+                    self.game_machine_frames = None
+            else:
+                self.game_machine_bg = None  # 使用动画帧时不需要单个背景
+                print(f"成功加载 {len(self.game_machine_frames)} 帧游戏机背景动画")
 
             # 游戏区域：1:1 正方形，左右居中，上下贴顶
             # 游戏区域宽度等于高度（正方形），不被缩放
@@ -104,6 +137,7 @@ class GameMixin(Scene):
         except Exception as e:
             print(f"无法加载游戏机背景图片: {e}")
             self.game_machine_bg = None
+            self.game_machine_frames = None
 
         # 预加载金币音效（如果存在）
         try:
@@ -245,6 +279,13 @@ class GameMixin(Scene):
                 self.next_scene = "menu"
 
     def _update_common_func(self, dt):
+        # 更新游戏机背景动画帧
+        if hasattr(self, 'game_machine_frames') and self.game_machine_frames:
+            self.animation_frame += self.animation_speed * dt * 60  # 假设60fps
+            # 循环播放（0-8，共9帧）
+            if self.animation_frame >= len(self.game_machine_frames):
+                self.animation_frame = 0.0
+        
         if not self.paused:
             # 如果小球正在滚入洞口，更新动画
             if self.ball.is_falling_into_hole:
@@ -271,8 +312,18 @@ class GameMixin(Scene):
             self.pauseMenu.update(dt)
 
     def draw_func(self, screen):
-        # 如果加载了游戏机背景，使用游戏机屏幕效果
-        if self.game_machine_bg:
+        # 如果加载了游戏机背景动画，使用游戏机屏幕效果
+        if hasattr(self, 'game_machine_frames') and self.game_machine_frames:
+            # 获取当前动画帧
+            current_frame_index = int(self.animation_frame) % len(self.game_machine_frames)
+            current_bg = self.game_machine_frames[current_frame_index]
+        elif self.game_machine_bg:
+            # 使用单个背景图片（后备方案）
+            current_bg = self.game_machine_bg
+        else:
+            current_bg = None
+        
+        if current_bg:
             # 创建游戏内容surface（1:1 正方形）
             game_surface = pygame.Surface((self.game_area_width, self.game_area_height))
             game_surface.fill(self.background_color)
@@ -321,8 +372,8 @@ class GameMixin(Scene):
             if self.paused:
                 self.pauseMenu.draw(game_surface)
             
-            # 将游戏机背景绘制到主屏幕
-            screen.blit(self.game_machine_bg, (0, 0))
+            # 将游戏机背景绘制到主屏幕（使用当前动画帧）
+            screen.blit(current_bg, (0, 0))
             
             # 将游戏内容surface直接绘制到游戏区域（不缩放，保持 1:1 比例)
             screen.blit(game_surface, (self.game_area_x, self.game_area_y))
