@@ -1,6 +1,6 @@
 import pygame
 
-from utils.settings import SCREEN_WIDTH, PLATFORM_MAX_SLOPE, PLATFORM_VY, BALL_RADIUS
+from utils.settings import GAME_WIDTH, PLATFORM_MAX_SLOPE, PLATFORM_VY, BALL_RADIUS
 
 
 class Platform:
@@ -41,6 +41,6 @@ class Platform:
             screen,
             (200, 50, 50),
             camera.world_to_screen(0, self.y1),
-            camera.world_to_screen(SCREEN_WIDTH, self.y2),
+            camera.world_to_screen(GAME_WIDTH, self.y2),
             8
         )

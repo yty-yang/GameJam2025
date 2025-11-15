@@ -4,7 +4,7 @@ from core.scenes.common.game_mixin import GameMixin
 from entities.coin import Coin
 from entities.hole import Hole
 from entities.obstacle import MovingPlatform, Spring, Teleporter
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_STATE, HOLE_RADIUS, COIN_RADIUS
+from utils.settings import GAME_WIDTH, GAME_HEIGHT, GAME_STATE, HOLE_RADIUS, COIN_RADIUS
 
 
 class EndlessScene(GameMixin):
@@ -15,7 +15,7 @@ class EndlessScene(GameMixin):
     def _generate_hole_coin(self, obj, count=3):
         # obj生成在屏幕上方
         for _ in range(count):
-            obj_x = random.randint(0, SCREEN_WIDTH)
+            obj_x = random.randint(0, int(GAME_WIDTH))
             obj_y = random.randint(-200, -10) + self.camera.y  # 基于摄像机位置生成在屏幕上方
 
             if obj == "hole":
@@ -35,8 +35,8 @@ class EndlessScene(GameMixin):
         """生成障碍物"""
         # 偶尔生成移动平台
         if random.random() < 1 and len(self.moving_platforms) < 2:
-            platform_x = random.randint(100, SCREEN_WIDTH - 100)
-            platform_y = self.camera.y - SCREEN_HEIGHT * 0.4 - random.randint(50, 200)
+            platform_x = random.randint(100, int(GAME_WIDTH) - 100)
+            platform_y = self.camera.y - GAME_HEIGHT * 0.4 - random.randint(50, 200)
             direction = random.choice([-1, 1])
             self.moving_platforms.append(
                 MovingPlatform(platform_x, platform_y, width=120, speed=80, direction=direction)
@@ -44,15 +44,15 @@ class EndlessScene(GameMixin):
 
         # 偶尔生成弹簧
         if random.random() < 1 and len(self.springs) < 3:
-            spring_x = random.randint(50, SCREEN_WIDTH - 50)
-            spring_y = self.camera.y - SCREEN_HEIGHT * 0.5 - random.randint(100, 250)
+            spring_x = random.randint(50, int(GAME_WIDTH) - 50)
+            spring_y = self.camera.y - GAME_HEIGHT * 0.5 - random.randint(100, 250)
             self.springs.append(Spring(spring_x, spring_y))
 
         # 偶尔生成传送门对
         if random.random() < 1 and len(self.teleporters) < 2:
-            tele1_x = random.randint(100, SCREEN_WIDTH - 100)
-            tele1_y = self.camera.y - SCREEN_HEIGHT * 0.5 - random.randint(150, 300)
-            tele2_x = random.randint(100, SCREEN_WIDTH - 100)
+            tele1_x = random.randint(100, int(GAME_WIDTH) - 100)
+            tele1_y = self.camera.y - GAME_HEIGHT * 0.5 - random.randint(150, 300)
+            tele2_x = random.randint(100, int(GAME_WIDTH) - 100)
             tele2_y = tele1_y - random.randint(200, 400)
             # 创建配对传送门，使用配对ID区分不同的传送门对
             pair_id = len(self.teleporters)  # 每个传送门对使用不同的ID
@@ -69,7 +69,7 @@ class EndlessScene(GameMixin):
     # 清理在平台下方一定距离的物体
     def _remove_offscreen_obj(self):
         lower_bound = (self.camera.world_to_screen(0, min(self.platform.y1, self.platform.y2))[1]
-                       + SCREEN_HEIGHT * 0.4 + 100)
+                       + GAME_HEIGHT * 0.4 + 100)
 
         self.holes = [hole for hole in self.holes
                       if self.camera.world_to_screen(hole.x, hole.y)[1] - HOLE_RADIUS < lower_bound]

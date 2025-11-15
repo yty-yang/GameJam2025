@@ -2,7 +2,7 @@ import math
 
 import pygame
 
-from utils.settings import BALL_RADIUS, TILT_SENSITIVITY, GRAVITY, SCREEN_WIDTH
+from utils.settings import BALL_RADIUS, TILT_SENSITIVITY, GRAVITY, GAME_WIDTH
 
 
 class Ball:
@@ -51,13 +51,13 @@ class Ball:
         if self.x - BALL_RADIUS < 0:
             self.x = BALL_RADIUS
             self.vx = -self.vx * self.bounce
-        elif self.x + BALL_RADIUS > SCREEN_WIDTH:
-            self.x = SCREEN_WIDTH - BALL_RADIUS
+        elif self.x + BALL_RADIUS > GAME_WIDTH:
+            self.x = GAME_WIDTH - BALL_RADIUS
             self.vx = -self.vx * self.bounce
 
         # ---- 平台方程： y = kx + b ----
         x1, y1 = 0, platform.y1
-        x2, y2 = SCREEN_WIDTH, platform.y2
+        x2, y2 = GAME_WIDTH, platform.y2
 
         dx = x2 - x1
         dy = y2 - y1
@@ -87,7 +87,7 @@ class Ball:
                 self.vx += GRAVITY * math.sin(angle) * tilt_sensitivity
 
     def collision_side(self):
-        if self.x - BALL_RADIUS <= 0 or self.x + BALL_RADIUS >= SCREEN_WIDTH:
+        if self.x - BALL_RADIUS <= 0 or self.x + BALL_RADIUS >= GAME_WIDTH:
             return True
         return False
 

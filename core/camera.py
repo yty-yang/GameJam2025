@@ -1,4 +1,4 @@
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from utils.settings import GAME_WIDTH, GAME_HEIGHT
 
 
 class Camera:
@@ -16,9 +16,9 @@ class Camera:
         target_screen_x/y: 小球在屏幕上的目标位置
         """
         if target_screen_x is None:
-            target_screen_x = SCREEN_WIDTH / 2
+            target_screen_x = GAME_WIDTH / 2
         if target_screen_y is None:
-            target_screen_y = SCREEN_HEIGHT * 0.6
+            target_screen_y = GAME_HEIGHT * 0.6
 
         # 平滑跟随
         self.x += (target_x - target_screen_x - self.x) * self.smooth

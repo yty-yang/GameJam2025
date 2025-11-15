@@ -55,7 +55,7 @@ class Coin:
             int(COIN_RADIUS * pulse_scale)
         )
 
-        # 内圈（深金色）
+        # 内圈（深金色） 
         pygame.draw.circle(
             screen,
             (200, 150, 0),

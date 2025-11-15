@@ -1,8 +1,10 @@
 import pygame
 
+from utils.settings import GAME_WIDTH, GAME_HEIGHT
+
 
 class PauseMenu:
-    def __init__(self, options=None, font_size=40, screen_width=800, screen_height=600):
+    def __init__(self, options=None, font_size=40, screen_width=GAME_WIDTH, screen_height=GAME_HEIGHT):
         """
         options: 菜单选项列表
         font_size: 字体大小

@@ -1,12 +1,12 @@
 import pygame
 import math
-from utils.settings import SCREEN_WIDTH
+from utils.settings import GAME_WIDTH
 
 
 class FinishLine:
     def __init__(self, y):
         self.y = y  # 终点线的世界坐标y
-        self.width = SCREEN_WIDTH
+        self.width = GAME_WIDTH
         self.thickness = 5
         self.animation_time = 0.0
 
@@ -24,7 +24,7 @@ class FinishLine:
     def draw(self, screen, camera):
         """绘制终点线（复古像素风格）"""
         screen_x1, screen_y = camera.world_to_screen(0, self.y)
-        screen_x2, _ = camera.world_to_screen(SCREEN_WIDTH, self.y)
+        screen_x2, _ = camera.world_to_screen(GAME_WIDTH, self.y)
         
         # 只绘制在屏幕可见范围内
         if screen_y < -50 or screen_y > screen.get_height() + 50:
