@@ -1,6 +1,6 @@
 import pygame
 import math
-from utils.settings import BALL_RADIUS
+from utils.settings import BALL_RADIUS, HOLE_RADIUS
 
 
 class MovingPlatform:
@@ -159,7 +159,7 @@ class Teleporter:
         self.y = y
         self.target_x = target_x
         self.target_y = target_y
-        self.radius = 25
+        self.radius = HOLE_RADIUS
         self.animation_time = 0.0
         self.pair_id = pair_id  # 配对ID，用于颜色区分
         self.pair_teleporter = pair_teleporter  # 配对传送门的引用
@@ -180,9 +180,6 @@ class Teleporter:
             return (self.target_x, self.target_y)
         return None
 
-    def draw_connection(self, screen, camera):
-        """不再绘制长连线，此方法保留以保持接口兼容"""
-        pass
 
     def draw(self, screen, camera):
         """绘制传送门"""
