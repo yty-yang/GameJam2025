@@ -152,6 +152,26 @@ class GameMixin(Scene):
                     sound_manager.load_sound("eat_coins", str(alt_path))
         except Exception as e:
             print(f"无法预加载金币音效: {e}")
+        
+        # 预加载小球滚动音效
+        try:
+            ball_roll_path = project_root / "data" / "sounds" / "ball_roll.mp3"
+            if ball_roll_path.exists():
+                sound_manager.load_sound("ball_roll", str(ball_roll_path))
+            else:
+                # 尝试其他可能的文件名
+                alt_path = project_root / "data" / "sounds" / "ball_rolls1.mp3"
+                if alt_path.exists():
+                    sound_manager.load_sound("ball_roll", str(alt_path))
+        except Exception as e:
+            print(f"无法预加载小球滚动音效: {e}")
+        
+        # 滚动音效状态
+        self.ball_rolling = False  # 小球是否正在滚动
+        self.roll_sound_channel = None  # 滚动音效的播放通道
+        self.platform_moving = False  # 平台是否在移动
+        self.last_platform_y1 = self.platform.y1
+        self.last_platform_y2 = self.platform.y2
 
 
     def _update_game_func(self, dt):
@@ -243,31 +263,73 @@ class GameMixin(Scene):
             self.shake_timer -= 1
             return random.randint(-2, 2), random.randint(-2, 2)
         return 0, 0
+    
+    def _update_roll_sound(self, dt):
+        """更新滚动音效播放"""
+        if "ball_roll" not in sound_manager.sounds:
+            return
+        
+        roll_sound = sound_manager.sounds["ball_roll"]
+        
+        # 如果小球开始滚动且音效未播放，开始播放
+        if self.ball_rolling and (self.roll_sound_channel is None or not self.roll_sound_channel.get_busy()):
+            # 估算滚动持续时间（基于当前速度）
+            # 如果速度很小，可能是短暂滚动，使用短循环
+            # 如果速度较大，可能是长时间滚动，使用长循环
+            speed = abs(self.ball.vx)
+            
+            # 播放音效，循环播放
+            self.roll_sound_channel = roll_sound.play(loops=-1)  # -1 表示无限循环
+            
+        # 如果小球停止滚动，停止音效
+        elif not self.ball_rolling and self.roll_sound_channel and self.roll_sound_channel.get_busy():
+            # 停止音效（会有淡出效果）
+            self.roll_sound_channel.fadeout(100)  # 100ms 淡出
+            self.roll_sound_channel = None
 
     def _handle_events_func(self, events):
         if not self.paused:
             """处理玩家输入，让平台上下移动"""
+            # 记录平台移动前的状态
+            prev_y1 = self.platform.y1
+            prev_y2 = self.platform.y2
+            
             keys = pygame.key.get_pressed()
+            platform_moved = False
             if keys[pygame.K_w]:
                 self.platform.move(True, False, True)
+                platform_moved = True
             if keys[pygame.K_UP]:
                 self.platform.move(False, True, True)
+                platform_moved = True
             if keys[pygame.K_s]:
                 self.platform.move(True, False, False)
+                platform_moved = True
             if keys[pygame.K_DOWN]:
                 self.platform.move(False, True, False)
+                platform_moved = True
             if self.joystick:
                 ly = self.joystick.get_axis(1)  # 左摇杆Y轴
                 ry = self.joystick.get_axis(3)  # 右摇杆Y轴
 
                 if ly < -0.2:  # 左摇杆上推
                     self.platform.move(True, False, True, speed_factor=min(1.0, -ly))
+                    platform_moved = True
                 if ry < -0.2:  # 右摇杆上推
                     self.platform.move(False, True, True, speed_factor=min(1.0, -ry))
+                    platform_moved = True
                 if ly > 0.2:  # 左摇杆下推
                     self.platform.move(True, False, False, speed_factor=min(1.0, ly))
+                    platform_moved = True
                 if ry > 0.2:  # 右摇杆下推
                     self.platform.move(False, True, False, speed_factor=min(1.0, ry))
+                    platform_moved = True
+            
+            # 检测平台是否移动
+            self.platform_moving = platform_moved or (
+                abs(self.platform.y1 - prev_y1) > 0.1 or 
+                abs(self.platform.y2 - prev_y2) > 0.1
+            )
 
             # 处理按键功能
             for event in events:
@@ -290,6 +352,29 @@ class GameMixin(Scene):
             # 循环播放（0-8，共9帧）
             if self.animation_frame >= len(self.game_machine_frames):
                 self.animation_frame = 0.0
+        
+        # 检测小球是否在滚动（在平台上且有水平速度）
+        if not self.paused and not self.ball.is_falling_into_hole:
+            # 检查小球是否在平台上
+            x1, y1 = 0, self.platform.y1
+            x2, y2 = GAME_WIDTH, self.platform.y2
+            dx = x2 - x1
+            dy = y2 - y1
+            
+            if dx != 0:
+                k = dy / dx
+                b = y1
+                y_ground = k * self.ball.x + b
+                on_platform = abs(self.ball.y + BALL_RADIUS - y_ground) < 5  # 在平台上5像素范围内
+            else:
+                on_platform = False
+            
+            # 小球在滚动：在平台上且有明显的水平速度
+            was_rolling = self.ball_rolling
+            self.ball_rolling = on_platform and abs(self.ball.vx) > 0.5
+            
+            # 处理滚动音效
+            self._update_roll_sound(dt)
         
         if not self.paused:
             # 如果小球正在滚入洞口，更新动画
