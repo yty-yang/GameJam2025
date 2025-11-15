@@ -21,7 +21,7 @@ def save_data():
     }
 
     # 获取项目根目录：core/scenes/common/game_mixin.py → 上三级目录
-    project_root = Path(__file__).resolve().parents[2]
+    project_root = Path(__file__).resolve().parents[3]
 
     # 确保 data 文件夹存在
     data_dir = project_root / "data" / "game"
