@@ -53,8 +53,6 @@ class HelpScene(Scene):
             "",
             "LEFT SIDE:    W = Up    S = Down",
             "RIGHT SIDE:   ↑ = Up    ↓ = Down", 
-            "",
-            "ESC = Pause / Return to Menu"
         ]
 
         current_y = 40
