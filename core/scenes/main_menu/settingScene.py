@@ -27,9 +27,20 @@ class SettingScene(Scene, menu_nav.MenuNavigationMixin):
                     if event.key == pygame.K_LEFT:
                         self.volume = max(0, self.volume - 1)
                         sound_manager.set_volume(self.volume / 10)
-                    elif event.key == pygame.K_RIGHT:
+                    if event.key == pygame.K_RIGHT:
                         self.volume = min(10, self.volume + 1)
                         sound_manager.set_volume(self.volume / 10)
+
+            # Joystick left/right to adjust volume
+            if event.type == pygame.JOYAXISMOTION and self.options[self.selected_index] == "Volume":
+                if event.axis == 0:  # horizontal axis
+                    if event.value < -0.5:
+                        self.volume = max(0, self.volume - 1)
+                        sound_manager.set_volume(self.volume / 10)
+                    elif event.value > 0.5:
+                        self.volume = min(10, self.volume + 1)
+                        sound_manager.set_volume(self.volume / 10)
+
 
         if menu_nav.confirm_pressed(events):
             self._select_option()
