@@ -8,8 +8,21 @@ def confirm_pressed(events):
     for event in events:
         if (event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN) or (
                 event.type == pygame.JOYBUTTONDOWN and event.button == 0):
-
-
+            # 播放按回车音效
+            try:
+                if "press_enter" not in sound_manager.sounds:
+                    # 懒加载音效
+                    from pathlib import Path
+                    project_root = Path(__file__).resolve().parents[3]
+                    press_enter_path = project_root / "data" / "sounds" / "press_enter.mp3"
+                    if press_enter_path.exists():
+                        sound_manager.load_sound("press_enter", str(press_enter_path))
+                
+                if "press_enter" in sound_manager.sounds:
+                    sound_manager.play_sound("press_enter")
+            except Exception:
+                pass  # 如果加载失败，不影响功能
+            
             return True
     return False
 

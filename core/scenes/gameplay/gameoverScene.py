@@ -17,8 +17,36 @@ class GameoverScene(Scene):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
+                    # 播放按回车音效
+                    from core.sound import sound_manager
+                    try:
+                        if "press_enter" not in sound_manager.sounds:
+                            from pathlib import Path
+                            project_root = Path(__file__).resolve().parents[3]
+                            press_enter_path = project_root / "data" / "sounds" / "press_enter.mp3"
+                            if press_enter_path.exists():
+                                sound_manager.load_sound("press_enter", str(press_enter_path))
+                        
+                        if "press_enter" in sound_manager.sounds:
+                            sound_manager.play_sound("press_enter")
+                    except Exception:
+                        pass
                     self.next_scene = "menu"  # 按 ESC 或 ENTER 返回菜单
             elif event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+                # 播放按回车音效
+                from core.sound import sound_manager
+                try:
+                    if "press_enter" not in sound_manager.sounds:
+                        from pathlib import Path
+                        project_root = Path(__file__).resolve().parents[3]
+                        press_enter_path = project_root / "data" / "sounds" / "press_enter.mp3"
+                        if press_enter_path.exists():
+                            sound_manager.load_sound("press_enter", str(press_enter_path))
+                    
+                    if "press_enter" in sound_manager.sounds:
+                        sound_manager.play_sound("press_enter")
+                except Exception:
+                    pass
                 self.next_scene = "menu"  # 按 ESC 或 ENTER 返回菜单
 
     def update(self, dt):

@@ -177,12 +177,31 @@ class GameMixin(Scene):
         except Exception as e:
             print(f"无法预加载胜利音效: {e}")
         
+        # 预加载掉落音效
+        try:
+            falling_hole_path = project_root / "data" / "sounds" / "falling_hole.mp3"
+            if falling_hole_path.exists():
+                sound_manager.load_sound("falling_hole", str(falling_hole_path))
+            else:
+                # 尝试其他可能的文件名
+                alt_path = project_root / "data" / "sounds" / "falling_hole1.mp3"
+                if alt_path.exists():
+                    sound_manager.load_sound("falling_hole", str(alt_path))
+        except Exception as e:
+            print(f"无法预加载掉落音效: {e}")
+        
         # 滚动音效状态
         self.ball_rolling = False  # 小球是否正在滚动
         self.roll_sound_channel = None  # 滚动音效的播放通道
         self.platform_moving = False  # 平台是否在移动
         self.last_platform_y1 = self.platform.y1
         self.last_platform_y2 = self.platform.y2
+        
+        # 掉落音效状态
+        self.ball_falling = False  # 小球是否正在掉落
+        self.falling_sound_channel = None  # 掉落音效的播放通道
+        self.last_ball_y = self.ball.y  # 上一帧小球Y坐标，用于检测高度持续降低
+        self.falling_sound_played = False  # 标记是否已经播放过掉落音效（避免重复播放）
 
         try:
             gameover_sound_path = project_root / "data" / "sounds" / "game_over.mp3"
@@ -305,6 +324,25 @@ class GameMixin(Scene):
             # 停止音效（会有淡出效果）
             self.roll_sound_channel.fadeout(100)  # 100ms 淡出
             self.roll_sound_channel = None
+    
+    def _update_falling_sound(self, dt):
+        """更新掉落音效播放"""
+        if "falling_hole" not in sound_manager.sounds:
+            return
+        
+        falling_sound = sound_manager.sounds["falling_hole"]
+        
+        # 如果小球开始掉落且音效未播放过，开始播放（只播放一次）
+        if self.ball_falling and not self.falling_sound_played:
+            # 播放掉落音效，只播放一次（不循环）
+            self.falling_sound_channel = falling_sound.play(loops=0)
+            self.falling_sound_played = True  # 标记已播放，避免重复播放
+            
+        # 如果小球停止掉落（回到平台或触发 game over），停止音效
+        elif not self.ball_falling and self.falling_sound_channel and self.falling_sound_channel.get_busy():
+            # 停止音效（会有淡出效果）
+            self.falling_sound_channel.fadeout(200)  # 200ms 淡出
+            self.falling_sound_channel = None
 
     def _handle_events_func(self, events):
         if not self.paused:
@@ -372,7 +410,7 @@ class GameMixin(Scene):
             if self.animation_frame >= len(self.game_machine_frames):
                 self.animation_frame = 0.0
         
-        # 检测小球是否在滚动（在平台上且有水平速度）
+        # 检测小球是否在滚动和掉落
         if not self.paused and not self.ball.is_falling_into_hole:
             # 检查小球是否在平台上
             x1, y1 = 0, self.platform.y1
@@ -387,20 +425,72 @@ class GameMixin(Scene):
                 on_platform = abs(self.ball.y + BALL_RADIUS - y_ground) < 5  # 在平台上5像素范围内
             else:
                 on_platform = False
+                y_ground = self.platform.y1
             
             # 小球在滚动：在平台上且有明显的水平速度
             was_rolling = self.ball_rolling
             self.ball_rolling = on_platform and abs(self.ball.vx) > 0.5
             
+            # 检测小球是否在平台下方且高度持续降低
+            # 小球在平台下方：小球底部在平台下方
+            below_platform = (self.ball.y + BALL_RADIUS) > y_ground + 5
+            # 高度持续降低：Y坐标持续增加（向下是正方向）或垂直速度向下
+            height_decreasing = self.ball.y > self.last_ball_y or self.ball.vy > 0
+            
+            # 如果小球在平台下方且高度持续降低，开始/继续掉落
+            if below_platform and height_decreasing:
+                if not self.ball_falling:
+                    self.ball_falling = True
+                    self.falling_sound_played = False  # 重置播放标志，允许播放音效
+            else:
+                # 如果小球不在平台下方或高度不再降低，停止掉落
+                if self.ball_falling:
+                    self.ball_falling = False
+                    self.falling_sound_played = False  # 重置播放标志
+                    if self.falling_sound_channel and self.falling_sound_channel.get_busy():
+                        self.falling_sound_channel.fadeout(200)
+                        self.falling_sound_channel = None
+            
+            # 如果小球在掉落状态，继续检测
+            if self.ball_falling:
+                # 计算小球在屏幕上的Y坐标
+                screen_x, screen_y = self.camera.world_to_screen(self.ball.x, self.ball.y)
+                # 如果掉出屏幕下方，停止掉落音效（即将触发 game over）
+                if screen_y > SCREEN_HEIGHT + 100:
+                    self.ball_falling = False
+                    if self.falling_sound_channel and self.falling_sound_channel.get_busy():
+                        self.falling_sound_channel.stop()
+                        self.falling_sound_channel = None
+            
+            # 更新上一帧的Y坐标
+            self.last_ball_y = self.ball.y
+            
             # 处理滚动音效
             self._update_roll_sound(dt)
+            
+            # 处理掉落音效
+            self._update_falling_sound(dt)
         
         if not self.paused:
             # 如果小球正在滚入洞口，更新动画
             if self.ball.is_falling_into_hole:
+                # 开始播放掉落音效（如果还没播放）
+                if not self.ball_falling:
+                    self.ball_falling = True
+                    self.falling_sound_played = False  # 重置播放标志
+                    self._update_falling_sound(dt)
+                
                 self.ball.update_fall_animation(dt)
                 # 动画完成后切换到游戏结束场景
                 if self.ball.is_animation_complete():
+                    # 停止掉落音效（在 game over 音效之前）
+                    if self.falling_sound_channel and self.falling_sound_channel.get_busy():
+                        self.falling_sound_channel.stop()
+                        self.falling_sound_channel = None
+                    self.ball_falling = False
+                    self.falling_sound_played = False  # 重置播放标志
+                    
+                    # 播放 game over 音效
                     sound_manager.play_sound("game_over")
                     self._finish(False)
             else:
@@ -412,6 +502,15 @@ class GameMixin(Scene):
                 
                 # 如果小球掉到屏幕下方（超过屏幕高度 + 一定缓冲距离），触发 game over
                 if screen_y > SCREEN_HEIGHT + 100:  # 掉出屏幕下方100像素后触发
+                    # 停止掉落音效（在 game over 音效之前）
+                    if self.falling_sound_channel and self.falling_sound_channel.get_busy():
+                        self.falling_sound_channel.stop()
+                        self.falling_sound_channel = None
+                    self.ball_falling = False
+                    self.falling_sound_played = False  # 重置播放标志
+                    
+                    # 播放 game over 音效
+                    sound_manager.play_sound("game_over")
                     self._finish(False)
 
             # 游戏结束保存状态
