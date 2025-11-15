@@ -190,7 +190,6 @@ class GameMixin(Scene):
         # 滚动音效状态
         self.ball_rolling = False  # 小球是否正在滚动
         self.roll_sound_channel = None  # 滚动音效的播放通道
-        self.platform_moving = False  # 平台是否在移动
         self.last_platform_y1 = self.platform.y1
         self.last_platform_y2 = self.platform.y2
         
@@ -345,9 +344,6 @@ class GameMixin(Scene):
         if not self.paused:
             """处理玩家输入，让平台上下移动"""
             # 记录平台移动前的状态
-            prev_y1 = self.platform.y1
-            prev_y2 = self.platform.y2
-            
             keys = pygame.key.get_pressed()
             platform_moved = False
             if keys[pygame.K_w]:
@@ -377,13 +373,9 @@ class GameMixin(Scene):
                     platform_moved = True
                 if ry > 0.2:  # 右摇杆下推
                     self.platform.move(False, True, False, speed_factor=min(1.0, ry))
-                    platform_moved = True
-            
-            # 检测平台是否移动
-            self.platform_moving = platform_moved or (
-                abs(self.platform.y1 - prev_y1) > 0.1 or 
-                abs(self.platform.y2 - prev_y2) > 0.1
-            )
+
+            if platform_moved:
+                self.ball.update(self.platform)
 
             # 处理按键功能
             for event in events:

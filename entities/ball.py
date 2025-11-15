@@ -71,7 +71,7 @@ class Ball:
 
             # 小球从上方落到平台，增加一个小的epsilon防止卡住
             epsilon = 1e-3
-            if self.vy > 0 and self.y + BALL_RADIUS >= y_ground - epsilon >= self.y - BALL_RADIUS:
+            if self.vy > 0 and self.y + BALL_RADIUS > y_ground - epsilon > self.y - BALL_RADIUS:
                 # 反弹：vy 反向乘以弹性系数
                 self.vy = -self.vy * self.bounce
                 # 落到平台表面
