@@ -35,7 +35,6 @@ class LevelScene(GameMixin):
 
         # 终点线（在小球上方一定距离）
         self.finish_line = None
-        self.start_y = self.ball.y  # 记录起始位置，用于计算进度
 
         self._init_obj(level_data)
 

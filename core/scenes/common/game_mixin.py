@@ -66,6 +66,8 @@ class GameMixin(Scene):
         # 计分系统
         self.score = 0
         self.speed_bonus = 0
+        self.start_y = self.ball.y  # 记录起始位置，用于计算进度
+        self.last_distance = 0.0  # 上一次计算的距离，用于增量计算
 
         # 背景色
         self.background_color = (30, 30, 30)
@@ -82,6 +84,26 @@ class GameMixin(Scene):
 
 
     def _update_game_func(self, dt):
+        """更新移动平台、弹簧、传送门和金币"""
+        # 实时增加分数（基于距离起点的位置）
+        if not self.paused and not self.ball.is_falling_into_hole:
+            # 计算向下移动的距离（游戏是向下进行的）
+            # 使用Y坐标的差值：向下移动时，start_y > ball.y，所以是正数
+            distance_traveled = self.start_y - self.ball.y
+
+            # 只有当距离增加时才更新分数（避免后退时减少分数）
+            if distance_traveled > self.last_distance:
+                # 计算新增的距离
+                distance_delta = distance_traveled - self.last_distance
+
+                # 根据距离增加分数：每向下移动1像素 = 1分
+                # 可以调整这个系数来改变分数增长速度
+                score_increase = int(distance_delta / 10)
+
+                if score_increase > 0:
+                    self.score += score_increase
+                    self.last_distance = distance_traveled
+
         """更新移动平台、弹簧、传送门和金币"""
         if hasattr(self, "moving_platforms"):
             for platform in self.moving_platforms:
@@ -126,14 +148,14 @@ class GameMixin(Scene):
     def _fall_into_hole_func(self):
         for hole in self.holes:
             if hole.check_collision(self.ball) and not self.ball.is_falling_into_hole:
-                # TODO: 分数得实时计算不能死了再算
-                # 计算速度奖励
-                speed = math.hypot(self.ball.vx, self.ball.vy)
-                speed_bonus = int(speed * 10)
-
-                # 计算分数
-                base_score = 100
-                self.score += base_score + speed_bonus
+                # 在开始动画前，确保最后一次距离计算完成
+                distance_traveled = self.start_y - self.ball.y
+                if distance_traveled > self.last_distance:
+                    distance_delta = distance_traveled - self.last_distance
+                    score_increase = int(distance_delta / 10)
+                    if score_increase > 0:
+                        self.score += score_increase
+                        self.last_distance = distance_traveled
 
                 self.ball.start_fall_animation(hole.x, hole.y)
 

@@ -125,6 +125,7 @@ def main():
     haptic = check_haptic()
 
     # 初始化音乐管理器
+    sound_manager.set_music_file("data/sounds/background.mp3")
     sound_manager.play_music()  # 循环播放主背景音乐
 
     # 初始化场景
