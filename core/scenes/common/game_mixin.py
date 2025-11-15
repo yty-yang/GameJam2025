@@ -150,18 +150,26 @@ class GameMixin(Scene):
         if not self.paused:
             """处理玩家输入，让平台上下移动"""
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_q]:
-                self.platform.move(True, False)
-            if keys[pygame.K_e]:
-                self.platform.move(False, True)
+            if keys[pygame.K_w]:
+                self.platform.move(True, False, True)
+            if keys[pygame.K_UP]:
+                self.platform.move(False, True, True)
+            if keys[pygame.K_s]:
+                self.platform.move(True, False, False)
+            if keys[pygame.K_DOWN]:
+                self.platform.move(False, True, False)
             if self.joystick:
                 ly = self.joystick.get_axis(1)  # 左摇杆Y轴
                 ry = self.joystick.get_axis(3)  # 右摇杆Y轴
 
                 if ly < -0.2:  # 左摇杆上推
-                    self.platform.move(True, False, speed_factor=min(1.0, -ly))
-                elif ry < -0.2:  # 右摇杆上推
-                    self.platform.move(False, True, speed_factor=min(1.0, -ry))
+                    self.platform.move(True, False, True, speed_factor=min(1.0, -ly))
+                if ry < -0.2:  # 右摇杆上推
+                    self.platform.move(False, True, True, speed_factor=min(1.0, -ry))
+                if ly > 0.2:  # 左摇杆下推
+                    self.platform.move(True, False, False, speed_factor=min(1.0, ly))
+                if ry > 0.2:  # 右摇杆下推
+                    self.platform.move(False, True, False, speed_factor=min(1.0, ry))
 
             # 处理按键功能
             for event in events:

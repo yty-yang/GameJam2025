@@ -10,17 +10,31 @@ class Platform:
         self.speed = speed
         self.base_y = y
 
-    def move(self, left, right, speed_factor=1.0):
-        if left:
-            self.y1 -= self.speed * speed_factor
+    def move(self, left, right, up, speed_factor=1.0):
+        if up:
+            if left:
+                self.y1 -= self.speed * speed_factor
 
-            if self.y2 > self.y1 + PLATFORM_MAX_SLOPE:
-                self.y2 = self.y1 + PLATFORM_MAX_SLOPE
-        if right:
-            self.y2 -= self.speed * speed_factor
+                if self.y2 > self.y1 + PLATFORM_MAX_SLOPE:
+                    self.y2 = self.y1 + PLATFORM_MAX_SLOPE
+            if right:
+                self.y2 -= self.speed * speed_factor
 
-            if self.y1 > self.y2 + PLATFORM_MAX_SLOPE:
-                self.y1 = self.y2 + PLATFORM_MAX_SLOPE
+                if self.y1 > self.y2 + PLATFORM_MAX_SLOPE:
+                    self.y1 = self.y2 + PLATFORM_MAX_SLOPE
+        else:
+            if left:
+                self.y1 += self.speed * speed_factor
+
+                if self.y1 > self.y2 + PLATFORM_MAX_SLOPE:
+                    self.y2 = self.y1 - PLATFORM_MAX_SLOPE
+            if right:
+                self.y2 += self.speed * speed_factor
+
+                if self.y2 > self.y1 + PLATFORM_MAX_SLOPE:
+                    self.y1 = self.y2 - PLATFORM_MAX_SLOPE
+
+
 
     def draw(self, screen, camera):
         pygame.draw.line(
