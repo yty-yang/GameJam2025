@@ -7,7 +7,7 @@ A challenging arcade-style game created in 24 hours for the University of Bristo
 
 Guide your ball through treacherous obstacles to reach the legendary "Glacier's Heart" beer in this retro-styled arcade challenge. Built with Python and Pygame.
 
-## Team Members
+## Team Members 👥
 
 ### Saturday 1️⃣9️⃣
 
@@ -24,11 +24,11 @@ Guide your ball through treacherous obstacles to reach the legendary "Glacier's 
 - **Right Side**: ↑ = Up, ↓ = Down
 - **ESC**: Pause/Return to menu
 
-## Run the Game
+## Run the Game 🎰
 
 ```bash
 python main.py
 ```
 ## Welcome to Sat 19, Ladies and Gentlemen ！！！
 
-![5081607a58536f9b92ca4e8dc116ff1a](https://github.com/user-attachments/assets/b221cb98-4004-441f-80d3-54239e6a7eae)
+![30d3368b434711a5169a285b5a205884](https://github.com/user-attachments/assets/9d25aff5-06fb-46d9-8d9b-a1bdacfda47c)
