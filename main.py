@@ -13,7 +13,7 @@ from core.scenes.main_menu.modeScene import ModeScene
 from core.scenes.main_menu.selectScene import SelectScene
 from core.scenes.main_menu.settingScene import SettingScene
 from core.sound import sound_manager
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_STATE
+from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_STATE, EXTRA
 
 try:
     import pygame.haptic as haptic_module
@@ -76,7 +76,6 @@ def check_haptic():
 
 def shake_apply(current_scene, screen):
     # 创建一个比屏幕大一些的缓冲区，避免抖动露边
-    EXTRA = 40
     buffer_surface = pygame.Surface((SCREEN_WIDTH + EXTRA, SCREEN_HEIGHT + EXTRA))
 
     # 清空缓冲区并绘制场景（场景会按自身坐标系画，不受抖动影响）
@@ -162,7 +161,7 @@ def main():
         # 场景逻辑
         current_scene.handle_events(events)
         current_scene.update(dt)
-        current_scene.draw(screen)
+        # current_scene.draw(screen)
 
         # screen shake apply
         shake_apply(current_scene, screen)

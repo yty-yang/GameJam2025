@@ -6,7 +6,7 @@ from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
 
 from core.ui import UI
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, EXTRA
 
 
 class MenuScene(Scene, menu_nav.MenuNavigationMixin):
@@ -25,7 +25,7 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         # 如果需要拉伸到全屏：
         self.background = pygame.transform.scale(
             self.background,
-            (SCREEN_WIDTH, SCREEN_HEIGHT)
+            (SCREEN_WIDTH + EXTRA, SCREEN_HEIGHT + EXTRA)
         )
 
     def _select_option(self):
