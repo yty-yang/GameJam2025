@@ -1,5 +1,6 @@
 import pygame
 from core.scenes.scene import Scene
+from core.scenes.common.menu_navigation_mixin import confirm_pressed
 
 class CreditsScene(Scene):
     def __init__(self):
@@ -18,11 +19,9 @@ class CreditsScene(Scene):
             self.small_font = pygame.font.SysFont("Courier", 18)
 
     def handle_events(self, events):
-        for event in events:
-            if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) or (
-                    event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
-                self.next_scene = "menu"
-                return
+        if confirm_pressed(events):
+            self.next_scene = "menu"
+            return
 
     def update(self, dt):
         pass
