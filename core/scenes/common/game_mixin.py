@@ -11,7 +11,7 @@ from core.ui import UI
 from entities.ball import Ball
 from entities.pauseMenu import PauseMenu
 from entities.platform import Platform
-from utils.settings import GAME_STATE, BALL_BOUNCE, SCREEN_WIDTH, BALL_RADIUS
+from utils.settings import GAME_STATE, BALL_BOUNCE, SCREEN_WIDTH, SCREEN_HEIGHT, BALL_RADIUS
 
 
 def save_data():
@@ -215,9 +215,16 @@ class GameMixin(Scene):
                 # 动画完成后切换到游戏结束场景
                 if self.ball.is_animation_complete():
                     self._finish(False)
-            # TODO: 增加游戏结束条件，小球掉出屏幕
             else:
                 self._update_entities(dt)
+                
+                # 检测小球是否掉出屏幕（掉到平台下方太远）
+                # 计算小球在屏幕上的Y坐标
+                screen_x, screen_y = self.camera.world_to_screen(self.ball.x, self.ball.y)
+                
+                # 如果小球掉到屏幕下方（超过屏幕高度 + 一定缓冲距离），触发 game over
+                if screen_y > SCREEN_HEIGHT + 100:  # 掉出屏幕下方100像素后触发
+                    self._finish(False)
 
             # 游戏结束保存状态
             if self.game_over:
