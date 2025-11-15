@@ -171,6 +171,10 @@ class Teleporter:
 
     def check_collision(self, ball):
         """检查碰撞并返回传送目标位置"""
+        # 如果小球还在传送冷却时间内，不触发传送
+        if hasattr(ball, 'teleport_cooldown') and ball.teleport_cooldown > 0:
+            return None
+        
         distance = math.hypot(self.x - ball.x, self.y - ball.y)
         if distance <= self.radius + BALL_RADIUS:
             return (self.target_x, self.target_y)

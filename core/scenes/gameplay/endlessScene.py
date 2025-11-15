@@ -89,7 +89,7 @@ class EndlessScene(GameMixin):
         self._fall_into_hole_func()
 
     def _update_entities(self, dt):
-        self.ball.update(self.platform)
+        self.ball.update(self.platform, dt)
 
         # 首次初始化生成洞和金币
         self._hole_coin_init()

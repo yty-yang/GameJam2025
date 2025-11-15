@@ -81,7 +81,7 @@ class LevelScene(GameMixin):
         self._fall_into_hole_func()
 
     def _update_entities(self, dt):
-        self.ball.update(self.platform)
+        self.ball.update(self.platform, dt)
 
         # 更新障碍物和金币
         self._obj_update(dt)

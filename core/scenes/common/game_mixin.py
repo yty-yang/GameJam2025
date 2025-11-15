@@ -136,6 +136,8 @@ class GameMixin(Scene):
                             self.ball.vx *= 0.5
                             self.ball.vy *= 0.5
                             self.shake_timer = 2
+                            # 设置传送冷却时间（0.5秒，防止立即传回）
+                            self.ball.teleport_cooldown = 0.5
                             teleported = True
                             break  # 只传送一次，不删除传送门对，允许重复使用
 

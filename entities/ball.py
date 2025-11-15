@@ -19,6 +19,9 @@ class Ball:
         self.hole_target_x = 0
         self.hole_target_y = 0
         self.original_radius = BALL_RADIUS
+        
+        # 传送冷却时间（防止反复传送）
+        self.teleport_cooldown = 0.0  # 冷却时间（秒）
 
     def _get_current_radius(self):
         """获取当前显示半径（动画时会缩小）"""
@@ -30,10 +33,14 @@ class Ball:
             return self.original_radius * (1.0 - eased_t)
         return self.original_radius
 
-    def update(self, platform):
+    def update(self, platform, dt=0.0):
         # 如果正在滚入洞口，不执行物理更新
         if self.is_falling_into_hole:
             return
+
+        # 更新传送冷却时间
+        if self.teleport_cooldown > 0:
+            self.teleport_cooldown -= dt
 
         # 重力
         self.vy += GRAVITY
