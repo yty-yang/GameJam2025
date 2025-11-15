@@ -161,6 +161,22 @@ class GameMixin(Scene):
         except Exception as e:
             print(f"无法预加载小球滚动音效: {e}")
         
+        # 预加载游戏结束音效
+        try:
+            game_over_path = project_root / "data" / "sounds" / "game_over.mp3"
+            if game_over_path.exists():
+                sound_manager.load_sound("game_over", str(game_over_path))
+        except Exception as e:
+            print(f"无法预加载游戏结束音效: {e}")
+        
+        # 预加载胜利音效
+        try:
+            winning_path = project_root / "data" / "sounds" / "winning.mp3"
+            if winning_path.exists():
+                sound_manager.load_sound("winning", str(winning_path))
+        except Exception as e:
+            print(f"无法预加载胜利音效: {e}")
+        
         # 滚动音效状态
         self.ball_rolling = False  # 小球是否正在滚动
         self.roll_sound_channel = None  # 滚动音效的播放通道

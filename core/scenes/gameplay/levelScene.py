@@ -94,6 +94,13 @@ class LevelScene(GameMixin):
         self._fall_into_hole()
 
     def _finish(self, victory):
+        # 播放相应的音效
+        from core.sound import sound_manager
+        if victory:
+            sound_manager.play_sound("winning")
+        else:
+            sound_manager.play_sound("game_over")
+        
         # 保存游戏状态
         GAME_STATE["score"] = self.score
         if self.score > GAME_STATE["highest_score"]:

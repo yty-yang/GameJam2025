@@ -121,6 +121,10 @@ class EndlessScene(GameMixin):
 
     # victory参数无意义，保持接口一致
     def _finish(self, victory):
+        # 播放游戏结束音效（无尽模式总是失败）
+        from core.sound import sound_manager
+        sound_manager.play_sound("game_over")
+        
         # 保存游戏状态
         GAME_STATE["score"] = self.score
         if self.score > GAME_STATE["highest_score"]:
