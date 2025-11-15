@@ -1,9 +1,10 @@
 import pygame
 
+import core.scenes.common.menu_navigation_mixin as menu_nav
 from utils.settings import GAME_WIDTH, GAME_HEIGHT
 
 
-class PauseMenu:
+class PauseMenu(menu_nav.MenuNavigationMixin):
     def __init__(self, options=None, font_size=40, screen_width=GAME_WIDTH, screen_height=GAME_HEIGHT):
         """
         options: 菜单选项列表
@@ -24,33 +25,10 @@ class PauseMenu:
             self.joystick.init()
 
     def handle_events(self, events):
-        if self.joystick:
-            ly = self.joystick.get_axis(1)
-            # 上推
-            if ly < -0.5 and not hasattr(self, "_joystick_up_pressed"):
-                self.selected_index = (self.selected_index - 1) % len(self.options)
-                self._joystick_up_pressed = True
-            elif ly > 0.5 and not hasattr(self, "_joystick_down_pressed"):
-                self.selected_index = (self.selected_index + 1) % len(self.options)
-                self._joystick_down_pressed = True
-            elif -0.3 < ly < 0.3:
-                # 归位，允许下一次输入
-                if hasattr(self, "_joystick_up_pressed"):
-                    delattr(self, "_joystick_up_pressed")
-                if hasattr(self, "_joystick_down_pressed"):
-                    delattr(self, "_joystick_down_pressed")
+        self._handle_common_navigation(events)
 
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.selected_index = (self.selected_index - 1) % len(self.options)
-                elif event.key == pygame.K_DOWN:
-                    self.selected_index = (self.selected_index + 1) % len(self.options)
-                elif event.key == pygame.K_RETURN:
-                    return self.options[self.selected_index]
-            elif event.type == pygame.JOYBUTTONDOWN and event.button == 0:
-                return self.options[self.selected_index]
-        return None
+        if menu_nav.confirm_pressed(events):
+            return self.options[self.selected_index]
 
     def update(self, dt):
         # TODO: 可以在这里加光标闪烁或动画

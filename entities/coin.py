@@ -3,6 +3,7 @@ import math
 import pygame
 
 from utils.settings import BALL_RADIUS, COIN_RADIUS
+from core.sound import sound_manager
 
 
 class Coin:
@@ -27,8 +28,14 @@ class Coin:
         return distance <= COIN_RADIUS + BALL_RADIUS
 
     def collect(self):
-        """收集金币"""
+        """收集金币并播放音效（幂等）。"""
+        if self.collected:
+            return
         self.collected = True
+        try:
+            sound_manager.play_sound("eat_coins")
+        except Exception:
+            pass
 
     def draw(self, screen, camera):
         """绘制金币（复古像素风格）"""

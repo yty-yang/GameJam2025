@@ -187,9 +187,6 @@ class GameMixin(Scene):
                     self.score += 50
                     self.shake_timer = 2
 
-                    # 播放金币收集音效
-                    sound_manager.play_sound("eat_coins")
-
     def _fall_into_hole_func(self):
         for hole in self.holes:
             if hole.check_collision(self.ball) and not self.ball.is_falling_into_hole:
@@ -332,7 +329,7 @@ class GameMixin(Scene):
             # 将游戏机背景绘制到主屏幕
             screen.blit(self.game_machine_bg, (0, 0))
             
-            # 将游戏内容surface直接绘制到游戏区域（不缩放，保持 1:1 比例）
+            # 将游戏内容surface直接绘制到游戏区域（不缩放，保持 1:1 比例)
             screen.blit(game_surface, (self.game_area_x, self.game_area_y))
         else:
             # 如果没有游戏机背景，使用原来的绘制方式
@@ -371,10 +368,10 @@ class GameMixin(Scene):
             # 再绘制小球（在上层，确保小球不会被洞口覆盖）
             self.ball.draw(screen, self.camera)
 
-            # 计算进度（距离终点的进度）
+            # 计算进度（距离终点的进度)
             progress = self._compute_progress() if hasattr(self, "finish_line") else 0
 
-            # 绘制UI（带CRT效果）
+            # 绘制UI（带CRT效果)
             ui = UI()
             ui.game_ui(screen, self.score, self.coins_collected, progress)
 
