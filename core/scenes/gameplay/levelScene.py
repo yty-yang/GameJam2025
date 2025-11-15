@@ -31,7 +31,7 @@ class LevelScene(GameMixin):
     def __init__(self, level):
         super().__init__()
 
-        level_data = load_level_data("level_1")
+        level_data = load_level_data(level)
 
         # 终点线（在小球上方一定距离）
         self.finish_line = None

@@ -115,12 +115,12 @@ def scene_switch(current_scene):
         current_scene = SettingScene()
     elif current_scene.next_scene == "select":
         current_scene = SelectScene()
-    elif current_scene.next_scene == "Level_1":
-        current_scene = LevelScene("Level_1")
+    elif current_scene.next_scene == "level_1":
+        current_scene = LevelScene("level_1")
     elif current_scene.next_scene == "Level_2":
-        current_scene = LevelScene("Level_2")
-    elif current_scene.next_scene == "Level_3":
-        current_scene = LevelScene("Level_3")
+        current_scene = LevelScene("level_2")
+    elif current_scene.next_scene == "level_3":
+        current_scene = LevelScene("level_3")
     elif current_scene.next_scene == "endless":
         current_scene = EndlessScene()
     elif current_scene.next_scene == "gameover":
