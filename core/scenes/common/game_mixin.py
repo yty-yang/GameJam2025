@@ -81,6 +81,39 @@ class GameMixin(Scene):
         self.paused = False
         self.game_over = False
         self.shake_timer = 0
+        
+        # 加载游戏机背景图片
+        project_root = Path(__file__).resolve().parents[3]
+        game_machine_path = project_root / "data" / "pictures" / "game_machine.png"
+        try:
+            self.game_machine_bg = pygame.image.load(str(game_machine_path)).convert_alpha()
+            # 缩放游戏机背景到屏幕大小
+            self.game_machine_bg = pygame.transform.scale(self.game_machine_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            # 游戏机屏幕区域（在游戏机图片中的位置和大小）
+            # 1:1 正方形，位置靠上
+            # 根据原始图片尺寸(1200x900)计算，然后按比例缩放到屏幕(800x600)
+            original_img_width = 1200
+            original_img_height = 900
+            scale_x = SCREEN_WIDTH / original_img_width  # 800/1200 = 0.667
+            scale_y = SCREEN_HEIGHT / original_img_height  # 600/900 = 0.667
+            
+            # 在原始图片中，屏幕区域大约在中间偏上位置
+            # 增大屏幕区域大小，让游戏画面更大
+            original_screen_size = 660  # 从600增加到750，让屏幕区域更大
+            # 缩放后的屏幕区域大小
+            screen_size = int(original_screen_size * scale_x)
+            self.screen_area_width = screen_size
+            self.screen_area_height = screen_size  # 1:1 比例
+            
+            # 在原始图片中，屏幕区域位置（假设水平居中，垂直靠上）
+            original_screen_x = (original_img_width - original_screen_size) / 2
+            original_screen_y = 3  # 距离顶部50像素（可根据实际图片调整）
+            # 缩放到屏幕坐标
+            self.screen_area_x = int(original_screen_x * scale_x)
+            self.screen_area_y = int(original_screen_y * scale_y)
+        except Exception as e:
+            print(f"无法加载游戏机背景图片: {e}")
+            self.game_machine_bg = None
 
 
     def _update_game_func(self, dt):
@@ -239,48 +272,109 @@ class GameMixin(Scene):
             self.pauseMenu.update(dt)
 
     def draw_func(self, screen):
-        screen.fill(self.background_color)
+        # 如果加载了游戏机背景，使用游戏机屏幕效果
+        if self.game_machine_bg:
+            # 创建游戏内容surface（游戏机屏幕大小）
+            game_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+            game_surface.fill(self.background_color)
+            
+            # camera跟随ball
+            self.camera.follow(self.ball.x, self.ball.y, target_screen_x=self.ball.x)
 
-        # camera跟随ball
-        self.camera.follow(self.ball.x, self.ball.y, target_screen_x=self.ball.x)
+            # 绘制平台
+            self.platform.draw(game_surface, self.camera)
 
-        # 绘制平台
-        self.platform.draw(screen, self.camera)
+            # 绘制终点线（在背景层）
+            if hasattr(self, "finish_line"):
+                self.finish_line.draw(game_surface, self.camera)
 
-        # 绘制终点线（在背景层）
-        if hasattr(self, "finish_line"):
-            self.finish_line.draw(screen, self.camera)
+            # 绘制障碍物
+            for platform in self.moving_platforms:
+                platform.draw(game_surface, self.camera)
+            for spring in self.springs:
+                spring.draw(game_surface, self.camera)
+            
+            # 绘制传送门（内部已包含箭头指示）
+            if hasattr(self, "teleporters"):
+                for t_pair in self.teleporters:
+                    for teleporter in t_pair:
+                        teleporter.draw(game_surface, self.camera)
 
-        # 绘制障碍物
-        for platform in self.moving_platforms:
-            platform.draw(screen, self.camera)
-        for spring in self.springs:
-            spring.draw(screen, self.camera)
-        
-        # 绘制传送门（内部已包含箭头指示）
-        if hasattr(self, "teleporters"):
-            for t_pair in self.teleporters:
-                for teleporter in t_pair:
-                    teleporter.draw(screen, self.camera)
+            # 绘制金币
+            for coin in self.coins:
+                if not coin.collected:
+                    coin.draw(game_surface, self.camera)
 
-        # 绘制金币
-        for coin in self.coins:
-            if not coin.collected:
-                coin.draw(screen, self.camera)
+            # 先绘制洞口（在底层）
+            for hole in self.holes:
+                hole.draw(game_surface, self.camera)
+            # 再绘制小球（在上层，确保小球不会被洞口覆盖）
+            self.ball.draw(game_surface, self.camera)
 
-        # 先绘制洞口（在底层）
-        for hole in self.holes:
-            hole.draw(screen, self.camera)
-        # 再绘制小球（在上层，确保小球不会被洞口覆盖）
-        self.ball.draw(screen, self.camera)
+            # 计算进度（距离终点的进度）
+            progress = self._compute_progress() if hasattr(self, "finish_line") else 0
 
-        # 计算进度（距离终点的进度）
-        progress = self._compute_progress() if hasattr(self, "finish_line") else 0
+            # 绘制UI（带CRT效果）
+            ui = UI()
+            ui.game_ui(game_surface, self.score, self.coins_collected, progress)
 
-        # 绘制UI（带CRT效果）
-        ui = UI()
-        ui.game_ui(screen, self.score, self.coins_collected, progress)
+            # 绘制暂停菜单
+            if self.paused:
+                self.pauseMenu.draw(game_surface)
+            
+            # 将游戏机背景绘制到主屏幕
+            screen.blit(self.game_machine_bg, (0, 0))
+            
+            # 将游戏内容surface缩放到游戏机屏幕区域并绘制
+            scaled_game = pygame.transform.scale(
+                game_surface, 
+                (self.screen_area_width, self.screen_area_height)
+            )
+            screen.blit(scaled_game, (self.screen_area_x, self.screen_area_y))
+        else:
+            # 如果没有游戏机背景，使用原来的绘制方式
+            screen.fill(self.background_color)
 
-        # 绘制暂停菜单
-        if self.paused:
-            self.pauseMenu.draw(screen)
+            # camera跟随ball
+            self.camera.follow(self.ball.x, self.ball.y, target_screen_x=self.ball.x)
+
+            # 绘制平台
+            self.platform.draw(screen, self.camera)
+
+            # 绘制终点线（在背景层）
+            if hasattr(self, "finish_line"):
+                self.finish_line.draw(screen, self.camera)
+
+            # 绘制障碍物
+            for platform in self.moving_platforms:
+                platform.draw(screen, self.camera)
+            for spring in self.springs:
+                spring.draw(screen, self.camera)
+            
+            # 绘制传送门（内部已包含箭头指示）
+            if hasattr(self, "teleporters"):
+                for t_pair in self.teleporters:
+                    for teleporter in t_pair:
+                        teleporter.draw(screen, self.camera)
+
+            # 绘制金币
+            for coin in self.coins:
+                if not coin.collected:
+                    coin.draw(screen, self.camera)
+
+            # 先绘制洞口（在底层）
+            for hole in self.holes:
+                hole.draw(screen, self.camera)
+            # 再绘制小球（在上层，确保小球不会被洞口覆盖）
+            self.ball.draw(screen, self.camera)
+
+            # 计算进度（距离终点的进度）
+            progress = self._compute_progress() if hasattr(self, "finish_line") else 0
+
+            # 绘制UI（带CRT效果）
+            ui = UI()
+            ui.game_ui(screen, self.score, self.coins_collected, progress)
+
+            # 绘制暂停菜单
+            if self.paused:
+                self.pauseMenu.draw(screen)
