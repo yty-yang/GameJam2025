@@ -10,6 +10,7 @@ from core.scenes.main_menu.creditsScene import CreditsScene
 from core.scenes.main_menu.helpScene import HelpScene
 from core.scenes.main_menu.menuScene import MenuScene
 from core.scenes.main_menu.modeScene import ModeScene
+from core.scenes.main_menu.selectScene import SelectScene
 from core.scenes.main_menu.settingScene import SettingScene
 from core.sound import sound_manager
 from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_STATE
@@ -113,8 +114,14 @@ def scene_switch(current_scene):
         current_scene = CreditsScene()
     elif current_scene.next_scene == "setting":
         current_scene = SettingScene()
-    elif current_scene.next_scene == "ball":
-        current_scene = LevelScene()
+    elif current_scene.next_scene == "select":
+        current_scene = SelectScene()
+    elif current_scene.next_scene == "Level_1":
+        current_scene = LevelScene("Level_1")
+    elif current_scene.next_scene == "Level_2":
+        current_scene = LevelScene("Level_2")
+    elif current_scene.next_scene == "Level_3":
+        current_scene = LevelScene("Level_3")
     elif current_scene.next_scene == "endless":
         current_scene = EndlessScene()
     elif current_scene.next_scene == "gameover":

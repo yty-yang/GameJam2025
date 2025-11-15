@@ -4,21 +4,23 @@ from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
 
 
-class ModeScene(Scene, menu_nav.MenuNavigationMixin):
+class SelectScene(Scene, menu_nav.MenuNavigationMixin):
     def __init__(self):
         super().__init__()
 
         self.font = pygame.font.SysFont(None, 48)
-        self.options = ["Level Mode", "Endless Mode", "Return to Menu"]
+        self.options = ["Level 1", "Level 2", "Level 3","Return"]
         self.selected_index = 0
 
     def _select_option(self):
-        if self.selected_index == 0:  # Start Game
-            self.next_scene = "select"  # 切换到模式选择场景
+        if self.selected_index == 0:
+            self.next_scene = "Level_1"
         elif self.selected_index == 1:
-            self.next_scene = "endless"
+            self.next_scene = "Level_2"
         elif self.selected_index == 2:
-            self.next_scene = "menu"
+            self.next_scene = "Level_3"
+        elif self.selected_index == 3:
+            self.next_scene = "mode"
 
     def handle_events(self, events):
         self._handle_common_navigation(events)

@@ -67,6 +67,7 @@ class EndlessScene(GameMixin):
         self._update_game_func(dt)
 
     # 清理在平台下方一定距离的物体
+    # TODO: 弃用
     def _remove_offscreen_obj(self):
         lower_bound = (self.camera.world_to_screen(0, min(self.platform.y1, self.platform.y2))[1]
                        + GAME_HEIGHT * 0.4 + 100)

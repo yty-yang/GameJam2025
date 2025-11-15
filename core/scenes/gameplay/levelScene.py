@@ -28,7 +28,7 @@ def load_level_data(id):
 
 
 class LevelScene(GameMixin):
-    def __init__(self):
+    def __init__(self, level):
         super().__init__()
 
         level_data = load_level_data("level_1")
