@@ -12,7 +12,7 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         super().__init__()
 
         self.font = pygame.font.SysFont(None, 48)
-        self.options = ["Start Game", "Help", "Setting", "Quit"]
+        self.options = ["Start Game", "Help", "Setting", "Credits", "Quit"]
         self.selected_index = 0
 
     def _select_option(self):
@@ -22,7 +22,9 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
             self.next_scene = "help"
         elif self.selected_index == 2:
             self.next_scene = "setting"
-        elif self.selected_index == 3:  # Quit
+        elif self.selected_index == 3:
+            self.next_scene = "credits"
+        elif self.selected_index == 4:  # Quit
             pygame.quit()
             exit()
 
