@@ -124,6 +124,7 @@ class LevelScene(GameMixin):
 
             # 检查是否到达终点
             if self.finish_line.check_reached(self.ball):
+
                 self._finish(True)
 
         self._update_common_func(dt)
