@@ -1,12 +1,14 @@
 import json
+import pygame
 from pathlib import Path
 
 from core.scenes.common.game_mixin import GameMixin
+from core.scenes.common.menu_navigation_mixin import confirm_pressed
 from entities.coin import Coin
 from entities.finishLine import FinishLine
 from entities.hole import Hole
 from entities.obstacle import MovingPlatform, Spring, Teleporter
-from utils.settings import GAME_STATE
+from utils.settings import GAME_STATE, SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 def load_level_data(id):
@@ -37,6 +39,16 @@ class LevelScene(GameMixin):
         self.finish_line = None
 
         self._init_obj(level_data)
+
+        # 前置对话
+        self.show_intro = False
+        self.intro_image = None
+        if level == "level_1":
+            project_root = Path(__file__).resolve().parents[3]
+            intro_path = project_root / "data" / "pictures" / "dialogs" / "before_game.png"
+
+            self.intro_image = pygame.image.load(intro_path).convert_alpha()
+            self.show_intro = True
 
 
 
@@ -124,9 +136,17 @@ class LevelScene(GameMixin):
         return self._get_shake_offset_func()
 
     def handle_events(self, events):
+        if self.show_intro:
+            if confirm_pressed(events):
+                self.show_intro = False  # 关闭前置对话
+            return
+
         self._handle_events_func(events)
 
     def update(self, dt):
+        if self.show_intro:
+            return
+
         if not self.paused:
             # 更新终点线动画
             self.finish_line.update(dt)
@@ -139,4 +159,24 @@ class LevelScene(GameMixin):
         self._update_common_func(dt)
 
     def draw(self, screen):
-        self.draw_func(screen)
+        if self.show_intro and self.intro_image:
+            # 获取原始尺寸
+            img_w, img_h = self.intro_image.get_size()
+
+            # 计算缩放比例，使宽度等于 SCREEN_WIDTH - 50
+            target_width = SCREEN_WIDTH - 50
+            scale_ratio = target_width / img_w
+            new_w = int(img_w * scale_ratio)
+            new_h = int(img_h * scale_ratio)
+
+            # 缩放图片
+            scaled_img = pygame.transform.smoothscale(self.intro_image, (new_w, new_h))
+
+            # 计算水平和垂直居中坐标
+            x = (SCREEN_WIDTH - new_w) // 2
+            y = (SCREEN_HEIGHT - new_h) // 2
+
+            # 绘制图片
+            screen.blit(scaled_img, (x, y))
+        else:
+            self.draw_func(screen)

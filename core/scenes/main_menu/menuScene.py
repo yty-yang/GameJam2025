@@ -6,7 +6,7 @@ from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
 
 from core.ui import UI
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, EXTRA
+from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class MenuScene(Scene, menu_nav.MenuNavigationMixin):
@@ -25,7 +25,7 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         # 如果需要拉伸到全屏：
         self.background = pygame.transform.scale(
             self.background,
-            (SCREEN_WIDTH + EXTRA, SCREEN_HEIGHT + EXTRA)
+            (SCREEN_WIDTH, SCREEN_HEIGHT)
         )
 
     def _select_option(self):
@@ -62,12 +62,9 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         ui = UI()
         ui.menu_ui(screen)
 
-        # 计算菜单总高度（选项高度 + 间距）
         option_height = self.font.get_height()
-        line_spacing = 40
-        total_height = len(self.options) * option_height + (len(self.options) - 1) * line_spacing
-
-        start_y = (SCREEN_WIDTH // 2) - (total_height // 2)
+        line_spacing = 30
+        start_y = int(SCREEN_HEIGHT * 0.4)
 
         # 绘制菜单选项
         for i, option in enumerate(self.options):
@@ -80,5 +77,7 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         hint_font = pygame.font.SysFont(None, 28)
         hint_text = "Use UP/DOWN arrows to navigate, ENTER to select"
         hint_surface = hint_font.render(hint_text, True, (200, 200, 200))
-        hint_rect = hint_surface.get_rect(center=(SCREEN_WIDTH // 2, start_y + total_height + 40))
+        hint_y = int(SCREEN_HEIGHT * 0.9)
+        hint_rect = hint_surface.get_rect(center=(SCREEN_WIDTH // 2, hint_y))
+
         screen.blit(hint_surface, hint_rect)

@@ -52,6 +52,112 @@
         "music": "",
         "time_limit": 300
       }
+    },
+    {
+      "id": "level_2",
+      "name": "Forest Edge",
+      "finish_line_y": -2000,
+      "holes": [
+        {
+          "x": 200,
+          "y": -1000
+        },
+        {
+          "x": 500,
+          "y": -950
+        }
+      ],
+      "coins": [
+        {
+          "x": 400,
+          "y": -900
+        },
+        {
+          "x": 300,
+          "y": -850
+        },
+        {
+          "x": 100,
+          "y": -920
+        }
+      ],
+      "obstacles": [
+        {
+          "type": "movingPlatform",
+          "x": 240,
+          "y": -980,
+          "direction": 1
+        },
+        {
+          "type": "spring",
+          "x": 180,
+          "y": -1050
+        },
+        {
+          "type": "teleporterPair",
+          "x1": 90,
+          "y1": -900,
+          "x2": 200,
+          "y2": -1100
+        }
+      ],
+      "metadata": {
+        "music": "",
+        "time_limit": 300
+      }
+    },
+    {
+      "id": "level_3",
+      "name": "Forest Edge",
+      "finish_line_y": -2000,
+      "holes": [
+        {
+          "x": 200,
+          "y": -1000
+        },
+        {
+          "x": 500,
+          "y": -950
+        }
+      ],
+      "coins": [
+        {
+          "x": 400,
+          "y": -900
+        },
+        {
+          "x": 300,
+          "y": -850
+        },
+        {
+          "x": 100,
+          "y": -920
+        }
+      ],
+      "obstacles": [
+        {
+          "type": "movingPlatform",
+          "x": 240,
+          "y": -980,
+          "direction": 1
+        },
+        {
+          "type": "spring",
+          "x": 180,
+          "y": -1050
+        },
+        {
+          "type": "teleporterPair",
+          "x1": 90,
+          "y1": -900,
+          "x2": 200,
+          "y2": -1100
+        }
+      ],
+      "metadata": {
+        "music": "",
+        "time_limit": 300
+      }
     }
   ]
 }

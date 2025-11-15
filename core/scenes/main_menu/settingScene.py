@@ -1,10 +1,54 @@
+import json
+from pathlib import Path
+
 import pygame
 
 from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
 from core.sound import sound_manager
 from core.ui import UI
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT
+from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_STATE
+
+
+def save_volume(volume):
+    data_to_save = {
+        "highest_score": GAME_STATE.get("highest_score", 0),
+        "total_coins": GAME_STATE.get("total_coins", 0),
+        "volume": volume,
+        "vibration": GAME_STATE.get("vibration", True)
+    }
+
+    # 获取项目根目录
+    project_root = Path(__file__).resolve().parents[3]
+
+    # 确保 data 文件夹存在
+    data_dir = project_root / "data" / "game"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    # 写入 JSON 文件
+    data_path = data_dir / "data.json"
+    with data_path.open("w", encoding="utf-8") as f:
+        json.dump(data_to_save, f, ensure_ascii=False, indent=4)
+
+def save_vibration(vibration):
+    data_to_save = {
+        "highest_score": GAME_STATE.get("highest_score", 0),
+        "total_coins": GAME_STATE.get("total_coins", 0),
+        "volume": GAME_STATE.get("volume", 5),
+        "vibration": vibration
+    }
+
+    # 获取项目根目录
+    project_root = Path(__file__).resolve().parents[3]
+
+    # 确保 data 文件夹存在
+    data_dir = project_root / "data" / "game"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    # 写入 JSON 文件
+    data_path = data_dir / "data.json"
+    with data_path.open("w", encoding="utf-8") as f:
+        json.dump(data_to_save, f, ensure_ascii=False, indent=4)
 
 
 class SettingScene(Scene, menu_nav.MenuNavigationMixin):
@@ -19,8 +63,8 @@ class SettingScene(Scene, menu_nav.MenuNavigationMixin):
         self.options = ["Volume", "Vibration", "Return"]
         self.selected_index = 0
 
-        self.volume = 5  # 0–10
-        self.vibration = True
+        self.volume = GAME_STATE["volume"]
+        self.vibration = GAME_STATE["vibration"]
 
     def handle_events(self, events):
         self._handle_common_navigation(events)
@@ -31,9 +75,13 @@ class SettingScene(Scene, menu_nav.MenuNavigationMixin):
                     if event.key == pygame.K_LEFT:
                         self.volume = max(0, self.volume - 1)
                         sound_manager.set_volume(self.volume / 10)
+                        GAME_STATE["volume"] = self.volume
+                        save_volume(self.volume)
                     if event.key == pygame.K_RIGHT:
                         self.volume = min(10, self.volume + 1)
                         sound_manager.set_volume(self.volume / 10)
+                        GAME_STATE["volume"] = self.volume
+                        save_volume(self.volume)
 
             # Joystick left/right to adjust volume
             if event.type == pygame.JOYAXISMOTION and self.options[self.selected_index] == "Volume":
@@ -41,9 +89,13 @@ class SettingScene(Scene, menu_nav.MenuNavigationMixin):
                     if event.value < -0.5:
                         self.volume = max(0, self.volume - 1)
                         sound_manager.set_volume(self.volume / 10)
+                        GAME_STATE["volume"] = self.volume
+                        save_volume(self.volume)
                     elif event.value > 0.5:
                         self.volume = min(10, self.volume + 1)
                         sound_manager.set_volume(self.volume / 10)
+                        GAME_STATE["volume"] = self.volume
+                        save_volume(self.volume)
 
         if menu_nav.confirm_pressed(events):
             self._select_option()
@@ -52,11 +104,13 @@ class SettingScene(Scene, menu_nav.MenuNavigationMixin):
         option = self.options[self.selected_index]
         if self.options[self.selected_index] == "Vibration":
             self.vibration = not self.vibration
+            GAME_STATE["vibration"] = self.vibration
+            save_vibration(self.vibration)
         elif option == "Return":
             self.next_scene = "menu"
 
     def update(self, dt):
-        sound_manager.set_volume(self.volume / 10)
+        pass
 
     def draw(self, screen):
         # 背景

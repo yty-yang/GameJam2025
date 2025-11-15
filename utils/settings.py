@@ -2,9 +2,6 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 FPS = 60
 
-# 屏幕额外扩展像素，shake效果需要
-EXTRA = 40
-
 GAME_WIDTH = SCREEN_WIDTH * 0.55
 GAME_HEIGHT = SCREEN_WIDTH * 0.55
 
@@ -31,5 +28,7 @@ GAME_STATE = {
     "coins": 0,
     "score": 0,
     "victory": False,
-    "endless": False
+    "endless": False,
+    "volume": 5,
+    "vibration": True
 }

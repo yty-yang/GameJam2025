@@ -18,7 +18,9 @@ from utils.settings import GAME_STATE, BALL_BOUNCE, SCREEN_WIDTH, SCREEN_HEIGHT,
 def save_data():
     data_to_save = {
         "highest_score": GAME_STATE.get("highest_score", 0),
-        "total_coins": GAME_STATE.get("total_coins", 0)
+        "total_coins": GAME_STATE.get("total_coins", 0),
+        "volume": GAME_STATE.get("volume", 5),
+        "vibration": GAME_STATE.get("vibration", True)
     }
 
     # 获取项目根目录：core/scenes/common/game_mixin.py → 上三级目录
@@ -575,12 +577,15 @@ class GameMixin(Scene):
             # 绘制暂停菜单
             if self.paused:
                 self.pauseMenu.draw(game_surface)
-            
+
+            # 获取游戏区域抖动偏移
+            dx, dy = self._get_shake_offset_func()
+
             # 将游戏机背景绘制到主屏幕（使用当前动画帧）
             screen.blit(current_bg, (0, 0))
             
             # 将游戏内容surface直接绘制到游戏区域（不缩放，保持 1:1 比例)
-            screen.blit(game_surface, (self.game_area_x, self.game_area_y))
+            screen.blit(game_surface, (self.game_area_x + dx, self.game_area_y + dy))
         else:
             # 如果没有游戏机背景，使用原来的绘制方式
             screen.fill(self.background_color)
