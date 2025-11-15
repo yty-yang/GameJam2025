@@ -97,5 +97,15 @@ class SoundManager:
         else:
             print(f"音效 {name} 尚未加载！")
 
+    def stop_sound(self, name: str):
+        """停止指定名字的音效，带存在性检查和异常处理。"""
+        if name in self.sounds:
+            try:
+                self.sounds[name].stop()
+            except Exception as e:
+                print(f"停止音效 {name} 失败: {e}")
+        else:
+            print(f"音效 {name} 尚未加载！")
+
 
 sound_manager = SoundManager()
