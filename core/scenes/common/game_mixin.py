@@ -7,6 +7,7 @@ import pygame
 
 from core.camera import Camera
 from core.scenes.scene import Scene
+from core.sound import sound_manager
 from core.ui import UI
 from entities.ball import Ball
 from entities.pauseMenu import PauseMenu
@@ -104,6 +105,20 @@ class GameMixin(Scene):
             print(f"无法加载游戏机背景图片: {e}")
             self.game_machine_bg = None
 
+        # 预加载金币音效（如果存在）
+        try:
+            coin_sound_path = project_root / "data" / "sounds" / "eat_coins.mp3"
+            if coin_sound_path.exists():
+                # load_sound 接受文件路径字符串
+                sound_manager.load_sound("eat_coins", str(coin_sound_path))
+            else:
+                # 兼容旧路径（有时文件名为 eat_coins.mp3 在 data/sounds 根目录）
+                alt_path = project_root / "data" / "sounds" / "eat_coins.mp3"
+                if alt_path.exists():
+                    sound_manager.load_sound("eat_coins", str(alt_path))
+        except Exception as e:
+            print(f"无法预加载金币音效: {e}")
+
 
     def _update_game_func(self, dt):
         """更新移动平台、弹簧、传送门和金币"""
@@ -171,6 +186,9 @@ class GameMixin(Scene):
                     self.coins_collected += 1
                     self.score += 50
                     self.shake_timer = 2
+
+                    # 播放金币收集音效
+                    sound_manager.play_sound("eat_coins")
 
     def _fall_into_hole_func(self):
         for hole in self.holes:

@@ -69,17 +69,31 @@ class SoundManager:
 
     # 音效管理
     def load_sound(self, name: str, filepath: str):
-        """加载一个音效并以名字存储"""
+        """加载一个音效并以名字存储；确保 mixer 初始化并捕获加载错误。"""
+        try:
+            # Ensure mixer initialized
+            if not pygame.mixer.get_init():
+                pygame.mixer.init()
+        except Exception as e:
+            print(f"初始化 pygame.mixer 失败: {e}")
+            return
+
         path = Path(filepath)
         if not path.exists():
             print(f"音效文件 {filepath} 未找到！")
             return
-        self.sounds[name] = pygame.mixer.Sound(str(path))
+        try:
+            self.sounds[name] = pygame.mixer.Sound(str(path))
+        except pygame.error as e:
+            print(f"加载音效失败 ({filepath}): {e}")
 
     def play_sound(self, name: str):
-        """播放指定名字的音效"""
+        """播放指定名字的音效，带存在性检查和异常处理。"""
         if name in self.sounds:
-            self.sounds[name].play()
+            try:
+                self.sounds[name].play()
+            except Exception as e:
+                print(f"播放音效 {name} 失败: {e}")
         else:
             print(f"音效 {name} 尚未加载！")
 
