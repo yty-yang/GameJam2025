@@ -5,6 +5,7 @@ def confirm_pressed(events):
     """检查回车/手柄按钮是否按下"""
     for event in events:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+
             return True
         if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
             return True
