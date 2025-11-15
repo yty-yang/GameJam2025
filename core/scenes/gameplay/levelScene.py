@@ -38,6 +38,8 @@ class LevelScene(GameMixin):
 
         self._init_obj(level_data)
 
+
+
     def _init_obj(self, level_data):
         # 初始化终点线
 
