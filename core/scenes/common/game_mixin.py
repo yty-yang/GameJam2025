@@ -111,11 +111,6 @@ class GameMixin(Scene):
             if coin_sound_path.exists():
                 # load_sound 接受文件路径字符串
                 sound_manager.load_sound("eat_coins", str(coin_sound_path))
-            else:
-                # 兼容旧路径（有时文件名为 eat_coins.mp3 在 data/sounds 根目录）
-                alt_path = project_root / "data" / "sounds" / "eat_coins.mp3"
-                if alt_path.exists():
-                    sound_manager.load_sound("eat_coins", str(alt_path))
         except Exception as e:
             print(f"无法预加载金币音效: {e}")
 
@@ -259,6 +254,7 @@ class GameMixin(Scene):
                 self.ball.update_fall_animation(dt)
                 # 动画完成后切换到游戏结束场景
                 if self.ball.is_animation_complete():
+
                     self._finish(False)
             else:
                 self._update_entities(dt)
