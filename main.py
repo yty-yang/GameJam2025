@@ -6,6 +6,7 @@ import pygame
 from core.scenes.gameplay.endlessScene import EndlessScene
 from core.scenes.gameplay.gameoverScene import GameoverScene
 from core.scenes.gameplay.levelScene import LevelScene
+from core.scenes.main_menu.creditsScene import CreditsScene
 from core.scenes.main_menu.helpScene import HelpScene
 from core.scenes.main_menu.menuScene import MenuScene
 from core.scenes.main_menu.modeScene import ModeScene
@@ -106,14 +107,16 @@ def scene_switch(current_scene):
         current_scene = MenuScene()
     elif current_scene.next_scene == "mode":
         current_scene = ModeScene()
+    elif current_scene.next_scene == "help":
+        current_scene = HelpScene()
+    elif current_scene.next_scene == "credits":
+        current_scene = CreditsScene()
+    elif current_scene.next_scene == "setting":
+        current_scene = SettingScene()
     elif current_scene.next_scene == "ball":
         current_scene = LevelScene()
     elif current_scene.next_scene == "endless":
         current_scene = EndlessScene()
-    elif current_scene.next_scene == "help":
-        current_scene = HelpScene()
-    elif current_scene.next_scene == "setting":
-        current_scene = SettingScene()
     elif current_scene.next_scene == "gameover":
         current_scene = GameoverScene()
 

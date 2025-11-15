@@ -1,6 +1,7 @@
 import pygame
 
 from core.scenes.scene import Scene
+from core.sound import sound_manager
 from core.ui import UI
 from utils.settings import GAME_STATE
 
@@ -12,6 +13,8 @@ class GameoverScene(Scene):
 
         self.font = pygame.font.SysFont(None, 50)
         self.small_font = pygame.font.SysFont(None, 36)
+
+        sound_manager.stop_sound("ball_roll")
 
     def handle_events(self, events):
         for event in events:

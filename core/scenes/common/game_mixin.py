@@ -153,11 +153,6 @@ class GameMixin(Scene):
             ball_roll_path = project_root / "data" / "sounds" / "ball_roll.mp3"
             if ball_roll_path.exists():
                 sound_manager.load_sound("ball_roll", str(ball_roll_path))
-            else:
-                # 尝试其他可能的文件名
-                alt_path = project_root / "data" / "sounds" / "ball_rolls1.mp3"
-                if alt_path.exists():
-                    sound_manager.load_sound("ball_roll", str(alt_path))
         except Exception as e:
             print(f"无法预加载小球滚动音效: {e}")
         
