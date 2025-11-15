@@ -114,6 +114,14 @@ class GameMixin(Scene):
         except Exception as e:
             print(f"无法预加载金币音效: {e}")
 
+        try:
+            gameover_sound_path = project_root / "data" / "sounds" / "game_over.mp3"
+            if gameover_sound_path.exists():
+                # load_sound 接受文件路径字符串
+                sound_manager.load_sound("game_over", str(gameover_sound_path))
+        except Exception as e:
+            print(f"无法预加载失败音效: {e}")
+
 
     def _update_game_func(self, dt):
         """更新移动平台、弹簧、传送门和金币"""
@@ -254,7 +262,7 @@ class GameMixin(Scene):
                 self.ball.update_fall_animation(dt)
                 # 动画完成后切换到游戏结束场景
                 if self.ball.is_animation_complete():
-
+                    sound_manager.play_sound("game_over")
                     self._finish(False)
             else:
                 self._update_entities(dt)
