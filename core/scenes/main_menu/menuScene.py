@@ -19,7 +19,7 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
 
         # 加载背景图
         project_root = Path(__file__).resolve().parents[3]   # 到 root/
-        bg_path = project_root / "data" / "pictures" / "menu_picture.jpg"
+        bg_path = project_root / "data" / "pictures" / "menu_background.png"
         self.background = pygame.image.load(bg_path).convert()
 
         # 如果需要拉伸到全屏：
