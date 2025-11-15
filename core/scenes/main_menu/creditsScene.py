@@ -48,10 +48,7 @@ class CreditsScene(Scene):
             "Member C - Art & Design",
             "Member D - Art & Design",
             "Member E - Sound & Music",
-            "Member F - Project Management",
-            "",
-            "Game Created in 24 Hours",
-            "for CSS Game Jam 2025"
+            "Member F - Project Management"
         ]
 
         current_y = 50
@@ -91,3 +88,4 @@ class CreditsScene(Scene):
         hint_text = self.small_font.render("Press SPACE or ESC to return", True, (150, 150, 200))
         hint_rect = hint_text.get_rect(center=(screen.get_width() // 2, screen.get_height() - 30))
         screen.blit(hint_text, hint_rect)
+
