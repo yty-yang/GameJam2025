@@ -1,0 +1,46 @@
+import pygame
+
+from core.scenes.scene import Scene
+import core.scenes.common.menu_navigation_mixin as menu_nav
+
+
+class ModeScene(Scene, menu_nav.MenuNavigationMixin):
+    def __init__(self):
+        super().__init__()
+
+        self.font = pygame.font.SysFont(None, 48)
+        self.options = ["Level Mode", "Endless Mode", "Return to Menu"]
+        self.selected_index = 0
+
+    def _select_option(self):
+        if self.selected_index == 0:  # Start Game
+            # TODO: 切换到关卡选择场景
+            self.next_scene = "ball"  # 切换到模式选择场景
+        elif self.selected_index == 1:
+            self.next_scene = "endless"
+        elif self.selected_index == 2:
+            self.next_scene = "menu"
+
+    def handle_events(self, events):
+        self._handle_common_navigation(events)
+
+        if menu_nav.confirm_pressed(events):
+            self._select_option()
+
+    def update(self, dt):
+        pass
+
+    def draw(self, screen):
+        screen.fill((50, 50, 50))
+
+        lines = self.options
+
+        line_height = self.font.get_height() + 10  # 每行间距 10 像素
+        total_height = len(lines) * line_height
+        start_y = (screen.get_height() - total_height) // 2  # 垂直居中
+
+        for i, line in enumerate(lines):
+            color = (255, 255, 0) if i == self.selected_index else (255, 255, 255)
+            text = self.font.render(line, True, color)
+            rect = text.get_rect(center=(screen.get_width() // 2, start_y + i * line_height))
+            screen.blit(text, rect)

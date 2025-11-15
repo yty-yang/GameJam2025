@@ -1,0 +1,57 @@
+{
+  "levels": [
+    {
+      "id": "level_1",
+      "name": "Forest Edge",
+      "finish_line_y": -2000,
+      "holes": [
+        {
+          "x": 500,
+          "y": -1000
+        },
+        {
+          "x": 1200,
+          "y": -950
+        }
+      ],
+      "coins": [
+        {
+          "x": 400,
+          "y": -900
+        },
+        {
+          "x": 800,
+          "y": -850
+        },
+        {
+          "x": 1100,
+          "y": -920
+        }
+      ],
+      "obstacles": [
+        {
+          "type": "movingPlatform",
+          "x": 600,
+          "y": -980,
+          "direction": 1
+        },
+        {
+          "type": "spring",
+          "x": 900,
+          "y": -1050
+        },
+        {
+          "type": "teleporterPair",
+          "x1": 600,
+          "y1": -900,
+          "x2": 300,
+          "y2": -1100
+        }
+      ],
+      "metadata": {
+        "music": "",
+        "time_limit": 300
+      }
+    }
+  ]
+}

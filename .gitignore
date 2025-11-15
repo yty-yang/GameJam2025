@@ -1,0 +1,61 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+*.pyenv/
+miniconda3/
+
+# VSCode / PyCharm / IDE files
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Pygame / game assets
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.swp
+
+# Build / dist folders (if any)
+build/
+dist/
+*.egg-info/
+
+# Game assets (optional: only if you don't want large assets tracked)
+#*.png
+#*.jpg
+#*.wav
+#*.mp3
+#*.ogg
+#*.mp4
+#*.mov
+
+# Python packaging
+pip-wheel-metadata/
+__pypackages__/
+
+# game data
+data/game/data.json
