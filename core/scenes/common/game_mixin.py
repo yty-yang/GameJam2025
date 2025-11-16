@@ -469,6 +469,7 @@ class GameMixin(Scene, GameMachineMixin):
                     self._finish(False)
 
             if self.beer:
+                GAME_STATE["slow_time"] = True
                 self.beer_timer -= dt  # dt 是本帧经过的秒数
                 if self.beer_timer <= 0:
                     self.beer = False
@@ -477,9 +478,14 @@ class GameMixin(Scene, GameMachineMixin):
 
             # 游戏结束保存状态
             if self.game_over:
+                GAME_STATE["slow_time"] = False
+                if self.roll_sound_channel and self.roll_sound_channel.get_busy():
+                    self.roll_sound_channel.fadeout(100)  # 100ms 淡出
+                self.roll_sound_channel = None
                 save_data()
 
         else:
+            GAME_STATE["slow_time"] = False
             if self.roll_sound_channel and self.roll_sound_channel.get_busy():
                 self.roll_sound_channel.fadeout(100)  # 100ms 淡出
             self.roll_sound_channel = None

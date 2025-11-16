@@ -123,6 +123,39 @@ class UI:
         )
         return pygame.transform.scale(small_screen, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+    def fuzzy(self, screen, intensity=5):
+        """
+        模拟醉酒视觉效果
+        :param screen: pygame.Surface
+        :param intensity: 效果强度，像素偏移量
+        """
+        if intensity <= 0:
+            return screen
+
+        # 创建副本
+        temp = screen.copy()
+
+        # 随机水平和垂直偏移
+        offset_x = random.randint(-intensity, intensity)
+        offset_y = random.randint(-intensity, intensity)
+
+        # 随机旋转角度（小角度）
+        angle = random.uniform(-intensity / 2, intensity / 2)
+
+        # 旋转图像
+        rotated = pygame.transform.rotate(temp, angle)
+
+        # 获取旋转后图像的矩形中心
+        rect = rotated.get_rect(center=(SCREEN_WIDTH // 2 + offset_x, SCREEN_HEIGHT // 2 + offset_y))
+
+        # 清屏
+        screen.fill((0, 0, 0))
+
+        # 绘制扭曲后的图像
+        screen.blit(rotated, rect.topleft)
+
+        return screen
+
     def apply_effects(self, screen):
         self._scanlines(screen)
         self._crt_curvature(screen)

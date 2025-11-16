@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pygame
 
-from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_WIDTH, GAME_HEIGHT
+from core.ui import UI
+from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_WIDTH, GAME_HEIGHT, GAME_STATE
 
 
 class GameMachineMixin:
@@ -92,5 +93,9 @@ class GameMachineMixin:
 
             # 将游戏内容surface直接绘制到游戏区域（不缩放，保持 1:1 比例)
             screen.blit(game_surface, (self.game_area_x + dx, self.game_area_y + dy))
+
+            ui = UI()
+            if GAME_STATE["slow_time"]:
+                ui.fuzzy(screen)
         else:
             self._draw_surface(screen)
