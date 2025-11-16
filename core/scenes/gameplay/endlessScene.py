@@ -112,7 +112,7 @@ class EndlessScene(GameMixin):
         # 如果洞口数量少于5，补充洞口
         desired_hole_num = 5
         if len(self.useful_holes) < desired_hole_num:
-            self._generate_hole_coin("hole", desired_hole_num - len(self.holes) + random.randint(0, 2))
+            self._generate_hole_coin("hole", desired_hole_num - len(self.useful_holes) + random.randint(0, 2))
         # 生成金币
         if len(self.useful_coins) < 3:
             self._generate_hole_coin("coin", random.randint(2, 3))

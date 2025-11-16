@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pygame
 
 from core.scenes.common.menu_navigation_mixin import confirm_pressed
@@ -13,7 +15,11 @@ class ShopScene(Scene):
         self.beer_choice_index = 0       # 0 = Yes, 1 = No
         self.font = pygame.font.Font(None, 36)
 
-        self.next_scene = None           # 用于返回菜单
+        # 加载背景图
+        project_root = Path(__file__).resolve().parents[3]
+        path = project_root / "data/pictures/level_end_background.png"
+        img = pygame.image.load(path).convert()
+        self.background = pygame.transform.scale(img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     def handle_events(self, events):
         if self.show_beer_prompt:
@@ -63,7 +69,7 @@ class ShopScene(Scene):
         pass
 
     def draw(self, screen):
-        screen.fill((30, 30, 30))  # 背景色
+        screen.blit(self.background, (0, 0))
 
         if self.show_beer_prompt:
             # 半透明背景
@@ -79,7 +85,7 @@ class ShopScene(Scene):
             pygame.draw.rect(screen, (200, 200, 200), (box_x, box_y, box_w, box_h), 3)
 
             # 文本
-            prompt_surface = self.font.render("Do you want a glass of beer(5 coins)?", True, (255, 255, 255))
+            prompt_surface = self.font.render("Do you want a beer ( 5 coins )", True, (255, 255, 255))
             prompt_rect = prompt_surface.get_rect(center=(SCREEN_WIDTH // 2, box_y + 40))
             screen.blit(prompt_surface, prompt_rect)
 
