@@ -78,6 +78,14 @@ class GameMixin(Scene, GameMachineMixin):
                 sound_manager.load_sound("eat_coins", str(coin_sound_path))
         except Exception as e:
             print(f"无法预加载金币音效: {e}")
+
+        # 预加载弹簧音效
+        try:
+            spring_path = project_root / "data" / "sounds" / "spring.mp3"
+            if spring_path.exists():
+                sound_manager.load_sound("spring", str(spring_path))
+        except Exception as e:
+            print(f"无法预加载弹簧音效: {e}")
         
         # 预加载小球滚动音效
         try:
@@ -108,11 +116,6 @@ class GameMixin(Scene, GameMachineMixin):
             falling_hole_path = project_root / "data" / "sounds" / "falling_hole.mp3"
             if falling_hole_path.exists():
                 sound_manager.load_sound("falling_hole", str(falling_hole_path))
-            else:
-                # 尝试其他可能的文件名
-                alt_path = project_root / "data" / "sounds" / "falling_hole1.mp3"
-                if alt_path.exists():
-                    sound_manager.load_sound("falling_hole", str(alt_path))
         except Exception as e:
             print(f"无法预加载掉落音效: {e}")
         
@@ -279,6 +282,13 @@ class GameMixin(Scene, GameMachineMixin):
             self.falling_sound_channel.fadeout(200)  # 200ms 淡出
             self.falling_sound_channel = None
 
+    # TODO: 弹簧音效
+    def _update_spring_sound(self, dt):
+        """更新弹簧音效播放"""
+        if "spring" not in sound_manager.sounds:
+            return
+
+
     def _handle_events_func(self, events):
         if not self.paused:
             """处理玩家输入，让平台上下移动"""
@@ -395,6 +405,8 @@ class GameMixin(Scene, GameMachineMixin):
             
             # 处理掉落音效
             self._update_falling_sound(dt)
+
+            self._update_spring_sound(dt)
         
         if not self.paused:
             # 如果小球正在滚入洞口，更新动画
