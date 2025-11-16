@@ -232,6 +232,7 @@ class GameMixin(Scene, GameMachineMixin):
         if self.shake_timer > 0:
             self.shake_timer -= 1
 
+            # TODO: 震动太小了现在
             # 手柄震动
             if GAME_STATE.get("vibration", True) and hasattr(self, 'joystick') and self.joystick:
                 # 震动强度根据剩余时间变化
