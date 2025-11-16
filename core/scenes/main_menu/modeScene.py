@@ -3,6 +3,7 @@ import pygame
 from core.scenes.common.game_machine_mixin import GameMachineMixin
 from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
+from core.ui import UI
 
 
 class ModeScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
@@ -31,8 +32,6 @@ class ModeScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
         self._update_game_machine_animation(dt)
 
     def _draw_surface(self, screen):
-        screen.fill((50, 50, 50))
-
         lines = self.options
 
         line_height = self.font.get_height() + 10  # 每行间距 10 像素
@@ -44,6 +43,9 @@ class ModeScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
             text = self.font.render(line, True, color)
             rect = text.get_rect(center=(screen.get_width() // 2, start_y + i * line_height))
             screen.blit(text, rect)
+
+        ui = UI()
+        ui.apply_effects(screen)
 
     def draw(self, screen):
         self._draw_with_bg(screen)

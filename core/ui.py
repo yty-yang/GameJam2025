@@ -10,9 +10,9 @@ class UI:
         pygame.font.init()
         # 使用像素风格字体（如果系统有的话）
         try:
-            self.font = pygame.font.Font("Courier", font_size)
+            self.font = pygame.font.Font(None, font_size)
         except:
-            self.font = pygame.font.SysFont(None, font_size)
+            self.font = pygame.font.SysFont("Courier", font_size)
 
         self.crt_time = 0.0
         self.scanline_offset = 0

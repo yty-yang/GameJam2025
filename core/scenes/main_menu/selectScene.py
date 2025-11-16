@@ -3,6 +3,7 @@ import pygame
 from core.scenes.common.game_machine_mixin import GameMachineMixin
 from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
+from core.ui import UI
 
 
 class SelectScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
@@ -44,6 +45,9 @@ class SelectScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
             text = self.font.render(line, True, color)
             rect = text.get_rect(center=(screen.get_width() // 2, start_y + i * line_height))
             screen.blit(text, rect)
+
+        ui = UI()
+        ui.apply_effects(screen)
 
     def draw(self, screen):
         self._draw_with_bg(screen)
