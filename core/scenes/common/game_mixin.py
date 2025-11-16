@@ -1,6 +1,7 @@
 import json
 
 import random
+import sys
 from pathlib import Path
 
 import pygame
@@ -300,6 +301,16 @@ class GameMixin(Scene):
     def _get_shake_offset_func(self):
         if self.shake_timer > 0:
             self.shake_timer -= 1
+
+            # 手柄震动
+            if GAME_STATE.get("vibration", True) and hasattr(self, 'joystick') and self.joystick:
+                # 震动强度根据剩余时间变化
+                strength = min(1.0, self.shake_timer / 50.0)
+                duration_ms = 100  # 每次震动持续100毫秒
+                from utils.vibrate import GameController
+                controller = GameController(joystick=self.joystick)
+                controller.rumble(strength=strength, duration_ms=duration_ms)
+
             return random.randint(-2, 2), random.randint(-2, 2)
         return 0, 0
     
@@ -365,7 +376,8 @@ class GameMixin(Scene):
                 platform_moved = True
             if self.joystick:
                 ly = self.joystick.get_axis(1)  # 左摇杆Y轴
-                ry = self.joystick.get_axis(3)  # 右摇杆Y轴
+                n = 4 if sys.platform.startswith("win") else 3
+                ry = self.joystick.get_axis(n)  # 右摇杆Y轴
 
                 if ly < -0.2:  # 左摇杆上推
                     self.platform.move(True, False, True, speed_factor=min(1.0, -ly))
