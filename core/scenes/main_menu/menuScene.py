@@ -17,16 +17,45 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         self.options = ["Start Game", "Help", "Shop", "Setting", "Credits", "Quit"]
         self.selected_index = 0
 
-        # 加载背景图
+        # 加载背景图（流水灯效果：循环播放 menu_background-1 和 menu_background-2）
         project_root = Path(__file__).resolve().parents[3]   # 到 root/
-        bg_path = project_root / "data" / "pictures" / "menu_background.png"
-        self.background = pygame.image.load(bg_path).convert()
-
-        # 如果需要拉伸到全屏：
-        self.background = pygame.transform.scale(
-            self.background,
-            (SCREEN_WIDTH, SCREEN_HEIGHT)
-        )
+        menu_bg_dir = project_root / "data" / "pictures" / "menu_background"
+        
+        self.background_frames = []
+        self.animation_timer = 0.0
+        self.animation_speed = 0.5  # 切换速度（秒）
+        
+        try:
+            # 加载两张背景图
+            for i in [1, 2]:
+                bg_path = menu_bg_dir / f"menu_background-{i}.png"
+                if bg_path.exists():
+                    bg = pygame.image.load(str(bg_path)).convert()
+                    # 拉伸到全屏
+                    bg = pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                    self.background_frames.append(bg)
+            
+            # 如果加载失败，使用默认背景作为后备
+            if len(self.background_frames) == 0:
+                bg_path = project_root / "data" / "pictures" / "menu_background.png"
+                if bg_path.exists():
+                    self.background = pygame.image.load(str(bg_path)).convert()
+                    self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+                else:
+                    self.background = None
+                self.background_frames = None
+            else:
+                self.background = None  # 使用动画帧时不需要单个背景
+        except Exception as e:
+            print(f"无法加载菜单背景动画: {e}")
+            # 后备方案：使用默认背景
+            bg_path = project_root / "data" / "pictures" / "menu_background.png"
+            if bg_path.exists():
+                self.background = pygame.image.load(str(bg_path)).convert()
+                self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            else:
+                self.background = None
+            self.background_frames = None
 
     def _select_option(self):
         if self.selected_index == 0:  # Start Game
@@ -55,11 +84,22 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
             self._select_option()
 
     def update(self, dt):
-        pass  # 菜单没有动画的话可以空着
+        # 更新背景动画（流水灯效果）
+        if self.background_frames and len(self.background_frames) > 0:
+            self.animation_timer += dt
+            # 持续累加，在 draw 中通过取模实现循环
 
     def draw(self, screen):
-        # 绘制背景
-        screen.blit(self.background, (0, 0))
+        # 绘制背景（流水灯效果）
+        if self.background_frames and len(self.background_frames) > 0:
+            # 根据动画时间选择当前帧
+            frame_index = int(self.animation_timer / self.animation_speed * len(self.background_frames))
+            frame_index = frame_index % len(self.background_frames)  # 循环
+            current_background = self.background_frames[frame_index]
+            screen.blit(current_background, (0, 0))
+        elif self.background:
+            # 后备方案：使用静态背景
+            screen.blit(self.background, (0, 0))
 
         ui = UI()
         ui.menu_ui(screen)
