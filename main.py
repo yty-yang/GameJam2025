@@ -23,7 +23,7 @@ def game_state_load():
     # 获取项目根目录
     project_root = Path(__file__).resolve().parent
 
-    # 确保 data 文件夹存在
+    # 确保 data 文件夹存在ww
     data_dir = project_root / "data" / "game"
     data_dir.mkdir(parents=True, exist_ok=True)
 
@@ -89,7 +89,6 @@ def scene_switch(current_scene):
     return current_scene
 
 
-# TODO: 没有淡出
 class IntroScene:
     def __init__(self, screen, music_file=None, duration=2.0, fade_time=2.0):
         """
@@ -126,18 +125,30 @@ class IntroScene:
     def update(self, dt):
         self.timer += dt
 
-        # 音乐渐入
-        if self.music_file and self.timer < self.fade_time:
-            volume = (self.timer / self.fade_time) * self.max_volume
-            sound_manager.set_volume(volume)
+        if self.music_file:
+            # 音乐渐入（淡入阶段）
+            if self.timer < self.fade_time:
+                volume = (self.timer / self.fade_time) * self.max_volume
+                sound_manager.set_volume(volume)
+            # 音乐保持最大音量（全显示阶段）
+            elif self.timer < self.fade_time + self.duration:
+                sound_manager.set_volume(self.max_volume)
+            # 音乐渐出（淡出阶段）
+            else:
+                fade_out_progress = (self.timer - self.fade_time - self.duration) / self.fade_time
+                volume = self.max_volume * (1 - fade_out_progress)
+                sound_manager.set_volume(max(0, volume))
 
         # 完成淡出后停止
         if self.timer >= self.fade_time * 2 + self.duration:
             self.done = True
             if self.music_file:
-                sound_manager.set_volume(self.max_volume)  # 保持最终音量
+                sound_manager.set_volume(self.max_volume)  # 恢复最终音量（给后续场景使用）
 
     def draw(self):
+        # 先清空屏幕（填充黑色背景）
+        self.screen.fill((0, 0, 0))
+        
         # 淡入 -> 全显示 -> 淡出
         if self.timer < self.fade_time:
             alpha = int(255 * (self.timer / self.fade_time))
@@ -162,27 +173,25 @@ def main():
     clock = pygame.time.Clock()
 
     game_state_load()
-    sound_manager.set_music_file("data/sounds/background.mp3")
-    sound_manager.set_volume(GAME_STATE["volume"] / 10.0)
-    sound_manager.play_music()
+    # 注意：音乐由 IntroScene 管理，这里不提前设置
 
     # ======== 开场淡入 + 音乐渐入 + 显示 + 淡出 ========
-    # intro_scene = IntroScene(
-    #     screen,
-    #     music_file="data/sounds/background.mp3",
-    #     duration=2.0,
-    #     fade_time=3.0  # 可以加长淡入淡出时间让效果更明显
-    # )
-    # intro_running = True
-    # while intro_running:
-    #     dt = clock.tick(FPS) / 1000
-    #     events = pygame.event.get()
-    #     intro_scene.handle_events(events)
-    #     intro_scene.update(dt)
-    #     intro_scene.draw()
-    #     pygame.display.flip()
-    #     if intro_scene.done:
-    #         intro_running = False
+    intro_scene = IntroScene(
+        screen,
+        music_file="data/sounds/background.mp3",
+        duration=1.0,
+        fade_time=1.0  # 可以加长淡入淡出时间让效果更明显
+    )
+    intro_running = True
+    while intro_running:
+        dt = clock.tick(FPS) / 1000
+        events = pygame.event.get()
+        intro_scene.handle_events(events)
+        intro_scene.update(dt)
+        intro_scene.draw()
+        pygame.display.flip()
+        if intro_scene.done:
+            intro_running = False
 
     # ======== 正常游戏菜单 ========
     current_scene = MenuScene()
