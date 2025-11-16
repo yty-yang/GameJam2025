@@ -4,6 +4,7 @@ from pathlib import Path
 
 from core.scenes.scene import Scene
 from core.scenes.common.menu_navigation_mixin import confirm_pressed
+from core.sound import sound_manager
 
 
 class LevelendScene(Scene):
@@ -27,6 +28,17 @@ class LevelendScene(Scene):
         self.cat_slide_duration = 1.5  # 猫滑入持续时间（增加时间让动画更明显）
         self.beer_spill_duration = 0.8  # 啤酒洒出持续时间
         self.beer_spill_delay = 0.5  # 啤酒洒出延迟（猫滑入后）
+        self.beer_spill_sound_played = False  # 是否已播放打翻音效
+        
+        # 预加载打翻啤酒音效
+        if not self.win:
+            try:
+                project_root = Path(__file__).resolve().parents[3]
+                broken_beer_path = project_root / "data" / "sounds" / "broken_beer_bottles.mp3"
+                if broken_beer_path.exists():
+                    sound_manager.load_sound("broken_beer_bottles", str(broken_beer_path))
+            except Exception as e:
+                print(f"无法预加载打翻啤酒音效: {e}")
 
     def handle_events(self, events):
         if confirm_pressed(events):
@@ -76,6 +88,15 @@ class LevelendScene(Scene):
             spill_start_time = cat_slide_start_delay + self.cat_slide_duration + self.beer_spill_delay
             if self.timer >= spill_start_time:
                 spill_elapsed = self.timer - spill_start_time
+                
+                # 播放打翻音效（仅在开始洒出时播放一次）
+                if not self.beer_spill_sound_played and spill_elapsed < 0.1:
+                    try:
+                        sound_manager.play_sound("broken_beer_bottles")
+                    except Exception:
+                        pass  # 如果音效加载失败，不影响功能
+                    self.beer_spill_sound_played = True
+                
                 if spill_elapsed < self.beer_spill_duration:
                     self.beer_spill_progress = spill_elapsed / self.beer_spill_duration
                     # 啤酒倾斜角度（从0到-30度）
