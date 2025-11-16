@@ -10,9 +10,9 @@ class UI:
         pygame.font.init()
         # 使用像素风格字体（如果系统有的话）
         try:
-            self.font = pygame.font.Font(None, font_size)
+            self.font = pygame.font.Font("Courier", font_size)
         except:
-            self.font = pygame.font.SysFont("Courier", font_size)
+            self.font = pygame.font.SysFont(None, font_size)
 
         self.crt_time = 0.0
         self.scanline_offset = 0
@@ -187,11 +187,20 @@ class UI:
         self.apply_effects(screen)
 
         # 绘制 GAME_STATE 信息
-        state_font = pygame.font.SysFont(None, 32)
+        state_color = (100, 255, 100)  # 柔和一点的绿色，不要太刺眼
+
         state_texts = [
-            f"Highest Score: {GAME_STATE['highest_score']}",
-            f"Coins: {GAME_STATE['total_coins']}"
+            f"PASS COUNT: {GAME_STATE['pass_count']}",
+            f"PLAY COUNT: {GAME_STATE['play_count']}",
+            f"HIGHEST SCORE: {GAME_STATE['highest_score']}",
+            f"COINS: {GAME_STATE['total_coins']}"
         ]
+
+        # 行间距更紧凑
+        base_x = 40
+        base_y = 40
+        line_height = 28
+
         for i, text in enumerate(state_texts):
-            text_surface = state_font.render(text, True, (0, 255, 0))
-            screen.blit(text_surface, (50, 50 + i * 40))  # 左上角显示
+            text_surface = self.font.render(text, True, state_color)
+            screen.blit(text_surface, (base_x, base_y + i * line_height))

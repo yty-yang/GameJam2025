@@ -18,6 +18,7 @@ class LevelendScene(Scene):
     def update(self, dt):
         pass
 
+    # TODO: 动画，人物浮现
     def draw(self, screen):
         # 获取项目根目录
         project_root = Path(__file__).resolve().parents[3]

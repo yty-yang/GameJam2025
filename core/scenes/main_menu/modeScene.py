@@ -10,7 +10,7 @@ class ModeScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
         super().__init__()
 
         self.font = pygame.font.SysFont(None, 48)
-        self.options = ["Level Mode", "Endless Mode", "Return to Menu"]
+        self.options = ["Stage Mode", "Endless Mode", "Return"]
         self.selected_index = 0
 
     def _select_option(self):
