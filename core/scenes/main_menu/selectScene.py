@@ -1,10 +1,11 @@
 import pygame
 
+from core.scenes.common.game_machine_mixin import GameMachineMixin
 from core.scenes.scene import Scene
 import core.scenes.common.menu_navigation_mixin as menu_nav
 
 
-class SelectScene(Scene, menu_nav.MenuNavigationMixin):
+class SelectScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
     def __init__(self):
         super().__init__()
 
@@ -29,11 +30,9 @@ class SelectScene(Scene, menu_nav.MenuNavigationMixin):
             self._select_option()
 
     def update(self, dt):
-        pass
+        self._update_game_machine_animation(dt)
 
-    def draw(self, screen):
-        screen.fill((50, 50, 50))
-
+    def _draw_surface(self, screen):
         lines = self.options
 
         line_height = self.font.get_height() + 10  # 每行间距 10 像素
@@ -45,3 +44,7 @@ class SelectScene(Scene, menu_nav.MenuNavigationMixin):
             text = self.font.render(line, True, color)
             rect = text.get_rect(center=(screen.get_width() // 2, start_y + i * line_height))
             screen.blit(text, rect)
+
+    def draw(self, screen):
+        self._draw_with_bg(screen)
+

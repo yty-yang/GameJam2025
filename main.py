@@ -152,22 +152,22 @@ def main():
     sound_manager.play_music()
 
     # ======== 开场淡入 + 音乐渐入 + 显示 + 淡出 ========
-    intro_scene = IntroScene(
-        screen,
-        music_file="data/sounds/background.mp3",
-        duration=2.0,
-        fade_time=3.0  # 可以加长淡入淡出时间让效果更明显
-    )
-    intro_running = True
-    while intro_running:
-        dt = clock.tick(FPS) / 1000
-        events = pygame.event.get()
-        intro_scene.handle_events(events)
-        intro_scene.update(dt)
-        intro_scene.draw()
-        pygame.display.flip()
-        if intro_scene.done:
-            intro_running = False
+    # intro_scene = IntroScene(
+    #     screen,
+    #     music_file="data/sounds/background.mp3",
+    #     duration=2.0,
+    #     fade_time=3.0  # 可以加长淡入淡出时间让效果更明显
+    # )
+    # intro_running = True
+    # while intro_running:
+    #     dt = clock.tick(FPS) / 1000
+    #     events = pygame.event.get()
+    #     intro_scene.handle_events(events)
+    #     intro_scene.update(dt)
+    #     intro_scene.draw()
+    #     pygame.display.flip()
+    #     if intro_scene.done:
+    #         intro_running = False
 
     # ======== 正常游戏菜单 ========
     current_scene = MenuScene()
