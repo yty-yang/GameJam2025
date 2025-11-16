@@ -420,6 +420,7 @@ class GameMixin(Scene, GameMachineMixin):
             
             # 如果小球在掉落状态，继续检测
             if self.ball_falling:
+                self.shake_timer = 40
                 # 计算小球在屏幕上的Y坐标
                 screen_x, screen_y = self.camera.world_to_screen(self.ball.x, self.ball.y)
                 # 如果掉出屏幕下方，停止掉落音效（即将触发 game over）
