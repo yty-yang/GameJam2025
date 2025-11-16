@@ -106,8 +106,17 @@ class IntroScene:
         # 加载图片
         project_root = Path(__file__).resolve().parent
         img_path = project_root / "data/pictures/beginning.png"
-        self.image = pygame.image.load(str(img_path)).convert_alpha()
-        self.image = pygame.transform.scale(self.image, screen.get_size())
+        original_image = pygame.image.load(str(img_path)).convert_alpha()
+        
+        # 将图片缩放到屏幕大小的 72%（稍微小一点）
+        scale_factor = 0.72
+        new_width = int(screen.get_width() * scale_factor)
+        new_height = int(screen.get_height() * scale_factor)
+        self.image = pygame.transform.scale(original_image, (new_width, new_height))
+        
+        # 计算居中位置
+        self.image_x = (screen.get_width() - new_width) // 2
+        self.image_y = (screen.get_height() - new_height) // 2
 
         # 背景音乐
         self.music_file = music_file
@@ -160,7 +169,7 @@ class IntroScene:
         alpha = max(0, min(255, alpha))
         img = self.image.copy()
         img.set_alpha(alpha)
-        self.screen.blit(img, (0, 0))
+        self.screen.blit(img, (self.image_x, self.image_y))
 
 
 def main():
