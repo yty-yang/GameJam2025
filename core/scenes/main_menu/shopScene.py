@@ -21,7 +21,7 @@ class ShopScene(Scene):
 
         # 加载背景图
         project_root = Path(__file__).resolve().parents[3]
-        path = project_root / "data/pictures/level_end_background.png"
+        path = project_root / "data/pictures/shop_background.png"
         img = pygame.image.load(path).convert()
         self.background = pygame.transform.scale(img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
