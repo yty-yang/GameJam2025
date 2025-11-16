@@ -4,6 +4,7 @@ from pathlib import Path
 
 from core.scenes.common.game_mixin import GameMixin
 from core.scenes.common.menu_navigation_mixin import confirm_pressed
+from core.sound import sound_manager
 from entities.coin import Coin
 from entities.finishLine import FinishLine
 from entities.hole import Hole
@@ -40,6 +41,7 @@ class LevelScene(GameMixin):
 
         self._init_obj(level_data)
 
+        self.level = level
         # 前置对话
         self.show_intro = False
         self.intro_image = None
@@ -108,13 +110,8 @@ class LevelScene(GameMixin):
         self._fall_into_hole()
 
     def _finish(self, victory):
-        # 播放相应的音效
-        from core.sound import sound_manager
-        if victory:
-            sound_manager.play_sound("winning")
-        else:
-            sound_manager.play_sound("game_over")
-        
+        sound_manager.stop_sound("ball_roll")
+
         # 保存游戏状态
         GAME_STATE["score"] = self.score
         if self.score > GAME_STATE["highest_score"]:
@@ -123,7 +120,26 @@ class LevelScene(GameMixin):
         GAME_STATE["coins"] = self.coins_collected
         GAME_STATE["victory"] = victory
         self.game_over = True
-        self.next_scene = "gameover"
+
+        project_root = Path(__file__).resolve().parents[3]
+        level_num = int(self.level.split("_")[1])
+        self.show_dialog = True
+        if victory:
+            sound_manager.play_sound("winning")
+            # 设置胜利对话显示
+            dialog_path = project_root / "data" / "pictures" / "dialogs" / f"win_{level_num}.png"
+            self.dialog_image = pygame.image.load(dialog_path).convert_alpha()
+
+            if level_num == 1 or level_num == 2:
+                self.next_scene_after_dialog = f"level_{level_num + 1}"
+            else:
+                self.next_scene_after_dialog = "menu"
+        else:
+            sound_manager.play_sound("game_over")
+
+            dialog_path = project_root / "data" / "pictures" / "dialogs" / f"gameover_{level_num}.png"
+            self.dialog_image = pygame.image.load(dialog_path).convert_alpha()
+            self.next_scene_after_dialog = f"level_{level_num}"
 
     def _compute_progress(self):
         total_distance = abs(self.start_y - self.finish_line.y)
@@ -141,11 +157,26 @@ class LevelScene(GameMixin):
                 self.show_intro = False  # 关闭前置对话
             return
 
+        if getattr(self, "show_dialog", False):
+            if confirm_pressed(events):
+                self.show_dialog = False
+                self.fade_out = True
+            return
+
         self._handle_events_func(events)
 
     def update(self, dt):
-        if self.show_intro:
+        if self.show_intro or getattr(self, "show_dialog", False):
             return
+
+        # 如果在渐变过程中
+        if self.fade_out:
+            self.fade_alpha += self.fade_speed * dt
+            if self.fade_alpha >= 255:
+                self.fade_alpha = 255
+                # 渐变完成，切换场景
+                self.next_scene = getattr(self, "next_scene_after_dialog", None)
+            return  # 渐变期间暂停游戏逻辑
 
         if not self.paused:
             # 更新终点线动画
@@ -153,7 +184,6 @@ class LevelScene(GameMixin):
 
             # 检查是否到达终点
             if self.finish_line.check_reached(self.ball):
-
                 self._finish(True)
 
         self._update_common_func(dt)
@@ -178,5 +208,23 @@ class LevelScene(GameMixin):
 
             # 绘制图片
             screen.blit(scaled_img, (x, y))
+        elif getattr(self, "show_dialog", False):
+            # 胜利对话绘制
+            img_w, img_h = self.dialog_image.get_size()
+            target_width = SCREEN_WIDTH - 50
+            scale_ratio = target_width / img_w
+            new_w = int(img_w * scale_ratio)
+            new_h = int(img_h * scale_ratio)
+            scaled_img = pygame.transform.smoothscale(self.dialog_image, (new_w, new_h))
+            x = (SCREEN_WIDTH - new_w) // 2
+            y = (SCREEN_HEIGHT - new_h) // 2
+            screen.blit(scaled_img, (x, y))
         else:
             self.draw_func(screen)
+
+        # 如果渐变中，绘制黑色覆盖层
+        if self.fade_out:
+            fade_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+            fade_surface.set_alpha(int(self.fade_alpha))
+            fade_surface.fill((0, 0, 0))
+            screen.blit(fade_surface, (0, 0))

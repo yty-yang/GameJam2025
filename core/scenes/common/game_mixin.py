@@ -92,6 +92,11 @@ class GameMixin(Scene):
         self.game_machine_frames = []
         self.animation_frame = 0.0
         self.animation_speed = 0.15  # 动画速度（每帧增加的帧数）
+
+        # 渐变黑屏控制
+        self.fade_out = False
+        self.fade_alpha = 0
+        self.fade_speed = 200
         
         try:
             # 加载所有动画帧（0-8）

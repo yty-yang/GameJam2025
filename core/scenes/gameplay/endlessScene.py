@@ -1,10 +1,12 @@
 import random
 
+import pygame
+
 from core.scenes.common.game_mixin import GameMixin
 from entities.coin import Coin
 from entities.hole import Hole
 from entities.obstacle import MovingPlatform, Spring, Teleporter
-from utils.settings import GAME_WIDTH, GAME_HEIGHT, GAME_STATE, HOLE_RADIUS, COIN_RADIUS
+from utils.settings import GAME_WIDTH, GAME_HEIGHT, GAME_STATE, HOLE_RADIUS, COIN_RADIUS, SCREEN_WIDTH, SCREEN_HEIGHT
 
 
 class EndlessScene(GameMixin):
@@ -136,7 +138,7 @@ class EndlessScene(GameMixin):
         GAME_STATE["endless"] = True
 
         self.game_over = True
-        self.next_scene = "gameover"
+        self.fade_out = True
 
     # main调用该方法获取屏幕抖动参数
     def get_shake_offset(self):
@@ -146,7 +148,23 @@ class EndlessScene(GameMixin):
         self._handle_events_func(events)
 
     def update(self, dt):
+        # 如果在渐变过程中
+        if self.fade_out:
+            self.fade_alpha += self.fade_speed * dt
+            if self.fade_alpha >= 255:
+                self.fade_alpha = 255
+                # 渐变完成，切换场景
+                self.next_scene = "gameover"
+            return  # 渐变期间暂停游戏逻辑
+
         self._update_common_func(dt)
 
     def draw(self, screen):
         self.draw_func(screen)
+
+        # 如果渐变中，绘制黑色覆盖层
+        if self.fade_out:
+            fade_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+            fade_surface.set_alpha(int(self.fade_alpha))
+            fade_surface.fill((0, 0, 0))
+            screen.blit(fade_surface, (0, 0))

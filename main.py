@@ -63,7 +63,7 @@ def scene_switch(current_scene):
         current_scene = SelectScene()
     elif current_scene.next_scene == "level_1":
         current_scene = LevelScene("level_1")
-    elif current_scene.next_scene == "Level_2":
+    elif current_scene.next_scene == "level_2":
         current_scene = LevelScene("level_2")
     elif current_scene.next_scene == "level_3":
         current_scene = LevelScene("level_3")
