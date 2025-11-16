@@ -502,6 +502,23 @@ class GameMixin(Scene, GameMachineMixin):
         # 计算进度（距离终点的进度）
         progress = self._compute_progress() if hasattr(self, "finish_line") else 0
 
+        # 生命数绘制（右上角）
+        if hasattr(self, "life"):
+            heart_radius = 10  # 心形圆点半径
+            spacing = 5  # 心形之间的间距
+            total_width = self.life * (2 * heart_radius + spacing) - spacing
+            start_x = GAME_WIDTH - 20 - total_width  # 右上角距离屏幕右边20像素
+            start_y = 20  # 距离屏幕顶部20像素
+
+            for i in range(self.life):
+                pygame.draw.circle(
+                    game_surface,
+                    (255, 0, 0),
+                    (start_x + i * (2 * heart_radius + spacing) + heart_radius, start_y + heart_radius),
+                    heart_radius
+                )
+
+
         # 绘制UI（带CRT效果）
         ui = UI()
         ui.game_ui(game_surface, self.score, self.coins_collected, progress)
@@ -511,7 +528,7 @@ class GameMixin(Scene, GameMachineMixin):
             self.pauseMenu.draw(game_surface)
 
         # 获取游戏区域抖动偏移
-        dx, dy = self._get_shake_offset_func()
+        return self._get_shake_offset_func()
 
     def draw_func(self, screen):
         self._draw_with_bg(screen)

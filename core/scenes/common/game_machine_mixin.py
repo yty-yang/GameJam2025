@@ -85,12 +85,13 @@ class GameMachineMixin:
             game_surface = pygame.Surface((self.game_area_width, self.game_area_height))
             game_surface.fill(self.background_color)
 
-            self._draw_surface(game_surface)
+            result = self._draw_surface(game_surface)
+            dx, dy = result if result is not None else (0, 0)
 
             # 将游戏机背景绘制到主屏幕（使用当前动画帧）
             screen.blit(current_bg, (0, 0))
 
             # 将游戏内容surface直接绘制到游戏区域（不缩放，保持 1:1 比例)
-            screen.blit(game_surface, (self.game_area_x, self.game_area_y))
+            screen.blit(game_surface, (self.game_area_x + dx, self.game_area_y + dy))
         else:
             self._draw_surface(screen)

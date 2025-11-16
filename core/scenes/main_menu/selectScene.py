@@ -15,11 +15,11 @@ class SelectScene(Scene, menu_nav.MenuNavigationMixin, GameMachineMixin):
 
     def _select_option(self):
         if self.selected_index == 0:
-            self.next_scene = "level_1"
+            self.next_scene = "level_1_3"
         elif self.selected_index == 1:
-            self.next_scene = "level_2"
+            self.next_scene = "level_2_3"
         elif self.selected_index == 2:
-            self.next_scene = "level_3"
+            self.next_scene = "level_3_3"
         elif self.selected_index == 3:
             self.next_scene = "mode"
 

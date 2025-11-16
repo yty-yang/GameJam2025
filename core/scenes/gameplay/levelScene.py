@@ -31,10 +31,12 @@ def load_level_data(id):
 
 
 class LevelScene(GameMixin):
-    def __init__(self, level):
+    def __init__(self, info):
         super().__init__()
 
+        level, life = info.rsplit("_", 1)
         level_data = load_level_data(level)
+        self.life = int(life)
 
         # 终点线（在小球上方一定距离）
         self.finish_line = None
@@ -131,7 +133,7 @@ class LevelScene(GameMixin):
             self.dialog_image = pygame.image.load(dialog_path).convert_alpha()
 
             if level_num == 1 or level_num == 2:
-                self.next_scene_after_dialog = f"level_{level_num + 1}"
+                self.next_scene_after_dialog = f"level_{level_num + 1}_{self.life}"
             else:
                 self.next_scene_after_dialog = "menu"
         else:
@@ -139,7 +141,7 @@ class LevelScene(GameMixin):
 
             dialog_path = project_root / "data" / "pictures" / "dialogs" / f"gameover_{level_num}.png"
             self.dialog_image = pygame.image.load(dialog_path).convert_alpha()
-            self.next_scene_after_dialog = f"level_{level_num}"
+            self.next_scene_after_dialog = f"level_{level_num}_{self.life - 1}" if self.life > 1 else "menu"
 
     def _compute_progress(self):
         total_distance = abs(self.start_y - self.finish_line.y)
@@ -147,7 +149,7 @@ class LevelScene(GameMixin):
 
         return 1.0 - (current_distance / total_distance) if total_distance > 0 else 0.0
 
-    # main调用该方法获取屏幕抖动参数
+    # 获取屏幕抖动参数
     def get_shake_offset(self):
         return self._get_shake_offset_func()
 
