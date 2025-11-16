@@ -28,7 +28,6 @@ GAME_STATE = {
     "coins": 0,
     "score": 0,
     "victory": False,
-    "endless": False,
     "volume": 5,
     "vibration": True
 }

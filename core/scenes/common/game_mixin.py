@@ -93,11 +93,6 @@ class GameMixin(Scene):
         self.game_machine_frames = []
         self.animation_frame = 0.0
         self.animation_speed = 0.15  # 动画速度（每帧增加的帧数）
-
-        # 渐变黑屏控制
-        self.fade_out = False
-        self.fade_alpha = 0
-        self.fade_speed = 200
         
         try:
             # 加载所有动画帧（0-8）
@@ -146,6 +141,11 @@ class GameMixin(Scene):
             print(f"无法加载游戏机背景图片: {e}")
             self.game_machine_bg = None
             self.game_machine_frames = None
+
+        # 渐变黑屏控制
+        self.fade_out = False
+        self.fade_alpha = 0
+        self.fade_speed = 200
 
         # 预加载金币音效（如果存在）
         try:

@@ -135,8 +135,6 @@ class EndlessScene(GameMixin):
         GAME_STATE["total_coins"] += self.coins_collected
         GAME_STATE["coins"] = self.coins_collected
 
-        GAME_STATE["endless"] = True
-
         self.game_over = True
         self.fade_out = True
 
