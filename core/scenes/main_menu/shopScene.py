@@ -2,6 +2,7 @@ import pygame
 
 from core.scenes.common.menu_navigation_mixin import confirm_pressed
 from core.scenes.scene import Scene
+from utils.helper import save_data
 from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, GAME_STATE
 
 class ShopScene(Scene):
@@ -46,9 +47,10 @@ class ShopScene(Scene):
             if confirm_pressed(events):
                 if self.beer_choice_index == 0:
                     # 玩家选择了 "Yes"
-                    if GAME_STATE["coins"] >= 5:
-                        GAME_STATE["coins"] -= 5
+                    if GAME_STATE["total_coins"] >= 5:
+                        GAME_STATE["total_coins"] -= 5
                         GAME_STATE["beer"] += 1
+                        save_data()
 
                 self.show_beer_prompt = False
                 self.next_scene = "menu"  # 返回主菜单

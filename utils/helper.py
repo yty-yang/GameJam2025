@@ -9,7 +9,7 @@ def save_data():
         "pass_count": GAME_STATE.get("pass_count", 0),
         "play_count": GAME_STATE.get("play_count", 0),
         "highest_score": GAME_STATE.get("highest_score", 0),
-        "coins": GAME_STATE.get("coins", 0),
+        "total_coins": GAME_STATE.get("total_coins", 0),
         "beer": GAME_STATE.get("beer", 0),
         "volume": GAME_STATE.get("volume", 5),
         "vibration": GAME_STATE.get("vibration", True)

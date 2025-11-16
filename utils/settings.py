@@ -21,10 +21,15 @@ HOLE_RADIUS = BALL_RADIUS + 5
 # 金币参数
 COIN_RADIUS = 12
 
+# 啤酒参数
+BEER_DURATION = 5  # seconds
+BEER_SPEED_FACTOR = 0.5
+
 # 游戏状态（用于场景间传递数据）
 GAME_STATE = {
     "pass_count": 0,
     "play_count": 0,
+    "total_coins": 0,
     "coins": 0,
     "score": 0,
 
@@ -32,5 +37,7 @@ GAME_STATE = {
 
     "victory": False,
     "volume": 5,
-    "vibration": True
+    "vibration": True,
+
+    "slow_time": False
 }

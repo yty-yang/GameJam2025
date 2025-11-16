@@ -9,6 +9,7 @@ from entities.coin import Coin
 from entities.finishLine import FinishLine
 from entities.hole import Hole
 from entities.obstacle import MovingPlatform, Spring, Teleporter
+from utils.helper import save_data
 from utils.settings import GAME_STATE, SCREEN_WIDTH, SCREEN_HEIGHT
 
 
@@ -135,8 +136,14 @@ class LevelScene(GameMixin):
             if level_num == 1 or level_num == 2:
                 self.next_scene_after_dialog = f"level_{level_num + 1}_{self.life}"
             else:
+                GAME_STATE["pass_count"] += 1
+                GAME_STATE["play_count"] += 1
+                save_data()
                 self.next_scene_after_dialog = "level_win"
         else:
+            GAME_STATE["play_count"] += 1
+            save_data()
+
             sound_manager.play_sound("game_over")
 
             dialog_path = project_root / "data" / "pictures" / "dialogs" / f"gameover_{level_num}.png"

@@ -140,8 +140,10 @@ class UI:
         self._draw_text(screen, f"SCORE: {score:06d}", 20, 20, (255, 255, 0))
 
         # 显示金币数
-        if coins > 0:
-            self._draw_text(screen, f"COINS: {coins}", 20, 50, (255, 215, 0))
+        self._draw_text(screen, f"COINS: {coins}", 20, 50, (255, 215, 0))
+
+        # 绘制啤酒数量
+        self._draw_text(screen, f"BEER: {GAME_STATE.get('beer', 0)}", 20, 80, (255, 180, 50))
 
         # 绘制进度条
         if progress > 0:
@@ -193,7 +195,7 @@ class UI:
             f"PASS COUNT: {GAME_STATE['pass_count']}",
             f"PLAY COUNT: {GAME_STATE['play_count']}",
             f"HIGHEST SCORE: {GAME_STATE['highest_score']}",
-            f"COINS: {GAME_STATE['coins']}"
+            f"COINS: {GAME_STATE['total_coins']}"
         ]
 
         # 行间距更紧凑

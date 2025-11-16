@@ -14,7 +14,7 @@ from core.ui import UI
 from entities.ball import Ball
 from entities.pauseMenu import PauseMenu
 from entities.platform import Platform
-from utils.settings import GAME_STATE, BALL_BOUNCE, SCREEN_HEIGHT, BALL_RADIUS, GAME_WIDTH
+from utils.settings import GAME_STATE, BALL_BOUNCE, SCREEN_HEIGHT, BALL_RADIUS, GAME_WIDTH, BEER_DURATION
 from utils.helper import save_data
 
 
@@ -53,6 +53,10 @@ class GameMixin(Scene, GameMachineMixin):
         self.speed_bonus = 0
         self.start_y = self.ball.y  # 记录起始位置，用于计算进度
         self.last_distance = 0.0  # 上一次计算的距离，用于增量计算
+
+        # 道具系统
+        self.beer = False  # 是否使用啤酒道具
+        self.beer_timer = 0.0  # 啤酒道具持续时间（秒）
 
         # 初始化摄像机
         self.camera = Camera(self.ball.x, self.ball.y)
@@ -332,8 +336,22 @@ class GameMixin(Scene, GameMachineMixin):
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.paused = not self.paused
-                elif event.type == pygame.JOYBUTTONDOWN and event.button == 0:
-                    self.paused = not self.paused
+                    if event.key == pygame.K_SPACE:
+                        if GAME_STATE["beer"] > 0 and not self.beer:
+                            self.beer = True
+                            self.beer_timer = BEER_DURATION
+                            GAME_STATE["slow_time"] = True
+                            GAME_STATE["beer"] -= 1
+                elif event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == 0:
+                        self.paused = not self.paused
+                    if event.button == 2:  # X 键 → 使用啤酒道具
+                        if GAME_STATE["beer"] > 0 and not self.beer:
+                            self.beer = True
+                            self.beer_timer = BEER_DURATION
+                            GAME_STATE["slow_time"] = True
+                            GAME_STATE["beer"] -= 1
+
         else:
             result = self.pauseMenu.handle_events(events)
             if result == "Resume":
@@ -450,11 +468,21 @@ class GameMixin(Scene, GameMachineMixin):
                     sound_manager.play_sound("game_over")
                     self._finish(False)
 
+            if self.beer:
+                self.beer_timer -= dt  # dt 是本帧经过的秒数
+                if self.beer_timer <= 0:
+                    self.beer = False
+                    self.beer_timer = 0
+                    GAME_STATE["slow_time"] = False
+
             # 游戏结束保存状态
             if self.game_over:
                 save_data()
 
         else:
+            if self.roll_sound_channel and self.roll_sound_channel.get_busy():
+                self.roll_sound_channel.fadeout(100)  # 100ms 淡出
+            self.roll_sound_channel = None
             self.pauseMenu.update(dt)
 
     def _draw_surface(self, game_surface):
@@ -509,6 +537,11 @@ class GameMixin(Scene, GameMachineMixin):
                     (start_x + i * (2 * heart_radius + spacing) + heart_radius, start_y + heart_radius),
                     heart_radius
                 )
+
+        if self.beer:
+            beer_text = f"Beer effect: {int(self.beer_timer)}s"
+            text_surface = pygame.font.SysFont(None, 26).render(beer_text, True, (255, 180, 50))
+            game_surface.blit(text_surface, (20, 100))  # 左上角显示
 
 
         # 绘制UI（带CRT效果）

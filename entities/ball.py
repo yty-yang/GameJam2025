@@ -2,7 +2,7 @@ import math
 
 import pygame
 
-from utils.settings import BALL_RADIUS, TILT_SENSITIVITY, GRAVITY, GAME_WIDTH
+from utils.settings import BALL_RADIUS, TILT_SENSITIVITY, GRAVITY, GAME_WIDTH, GAME_STATE, BEER_SPEED_FACTOR
 
 
 class Ball:
@@ -34,6 +34,10 @@ class Ball:
         return self.original_radius
 
     def update(self, platform, dt=0.0):
+        if GAME_STATE["slow_time"]:
+            self.vx *= BEER_SPEED_FACTOR
+            self.vy *= BEER_SPEED_FACTOR
+
         # 如果正在滚入洞口，不执行物理更新
         if self.is_falling_into_hole:
             return
