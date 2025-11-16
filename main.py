@@ -75,6 +75,69 @@ def scene_switch(current_scene):
     return current_scene
 
 
+# TODO: 没有淡出
+class IntroScene:
+    def __init__(self, screen, music_file=None, duration=2.0, fade_time=2.0):
+        """
+        screen: pygame 屏幕
+        music_file: 背景音乐路径（可选）
+        duration: 图片完全显示的时间（秒）
+        fade_time: 淡入/淡出时间（秒）
+        """
+        self.screen = screen
+        self.duration = duration
+        self.fade_time = fade_time
+        self.timer = 0.0
+        self.done = False
+
+        # 加载图片
+        project_root = Path(__file__).resolve().parent
+        img_path = project_root / "data/pictures/beginning.png"
+        self.image = pygame.image.load(str(img_path)).convert_alpha()
+        self.image = pygame.transform.scale(self.image, screen.get_size())
+
+        # 背景音乐
+        self.music_file = music_file
+        if self.music_file:
+            sound_manager.set_music_file(self.music_file)
+            sound_manager.play_music(loop=-1)  # 循环播放
+            self.max_volume = sound_manager.volume
+            sound_manager.set_volume(0)  # 初始静音
+
+    def handle_events(self, events):
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.done = True
+
+    def update(self, dt):
+        self.timer += dt
+
+        # 音乐渐入
+        if self.music_file and self.timer < self.fade_time:
+            volume = (self.timer / self.fade_time) * self.max_volume
+            sound_manager.set_volume(volume)
+
+        # 完成淡出后停止
+        if self.timer >= self.fade_time * 2 + self.duration:
+            self.done = True
+            if self.music_file:
+                sound_manager.set_volume(self.max_volume)  # 保持最终音量
+
+    def draw(self):
+        # 淡入 -> 全显示 -> 淡出
+        if self.timer < self.fade_time:
+            alpha = int(255 * (self.timer / self.fade_time))
+        elif self.timer < self.fade_time + self.duration:
+            alpha = 255
+        else:
+            alpha = int(255 * (1 - (self.timer - self.fade_time - self.duration) / self.fade_time))
+
+        alpha = max(0, min(255, alpha))
+        img = self.image.copy()
+        img.set_alpha(alpha)
+        self.screen.blit(img, (0, 0))
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode(
@@ -85,12 +148,28 @@ def main():
     clock = pygame.time.Clock()
 
     game_state_load()
-
-    # 初始化音乐管理器
     sound_manager.set_music_file("data/sounds/background.mp3")
-    sound_manager.play_music()  # 循环播放主背景音乐
+    sound_manager.play_music()
 
-    # 初始化场景
+    # ======== 开场淡入 + 音乐渐入 + 显示 + 淡出 ========
+    intro_scene = IntroScene(
+        screen,
+        music_file="data/sounds/background.mp3",
+        duration=2.0,
+        fade_time=3.0  # 可以加长淡入淡出时间让效果更明显
+    )
+    intro_running = True
+    while intro_running:
+        dt = clock.tick(FPS) / 1000
+        events = pygame.event.get()
+        intro_scene.handle_events(events)
+        intro_scene.update(dt)
+        intro_scene.draw()
+        pygame.display.flip()
+        if intro_scene.done:
+            intro_running = False
+
+    # ======== 正常游戏菜单 ========
     current_scene = MenuScene()
     running = True
 
@@ -101,14 +180,10 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-        # 场景逻辑
         current_scene.handle_events(events)
         current_scene.update(dt)
         current_scene.draw(screen)
-
         pygame.display.flip()
-
-        # 场景切换
         current_scene = scene_switch(current_scene)
 
     pygame.quit()
