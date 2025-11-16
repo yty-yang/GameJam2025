@@ -186,6 +186,9 @@ class GameMixin(Scene, GameMachineMixin):
             for spring in self.springs:
                 spring.update(dt)
                 if spring.check_collision(self.ball):
+                    # 播放弹簧音效
+                    sound_manager.play_sound("spring")
+                    
                     # 弹簧弹跳
                     self.ball.vy = -spring.bounce_power
                     self.shake_timer = 5
