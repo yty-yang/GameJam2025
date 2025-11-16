@@ -23,11 +23,11 @@ class MenuScene(Scene, menu_nav.MenuNavigationMixin):
         
         self.background_frames = []
         self.animation_timer = 0.0
-        self.animation_speed = 0.5  # 切换速度（秒）
-        
+        self.animation_speed = 0.45  # 切换速度（秒）
+
         try:
             # 加载两张背景图
-            for i in [1, 2]:
+            for i in range(0, 3):
                 bg_path = menu_bg_dir / f"menu_background-{i}.png"
                 if bg_path.exists():
                     bg = pygame.image.load(str(bg_path)).convert()
