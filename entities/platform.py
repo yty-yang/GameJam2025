@@ -34,13 +34,24 @@ class Platform:
                 if self.y2 > self.y1 + PLATFORM_MAX_SLOPE:
                     self.y1 = self.y2 - PLATFORM_MAX_SLOPE
 
+    def _draw_metal_line(self,screen, start, end, width):
+        # 金属的三层颜色
+        colors = [(220, 220, 220), (180, 180, 180), (120, 120, 120)]
+        offsets = [-width // 4, 0, width // 4]
 
+        for c, o in zip(colors, offsets):
+            pygame.draw.line(
+                screen,
+                c,
+                (start[0], start[1] + o),
+                (end[0], end[1] + o),
+                width // 3
+            )
 
     def draw(self, screen, camera):
-        pygame.draw.line(
+        self._draw_metal_line(
             screen,
-            (200, 50, 50),
             camera.world_to_screen(0, self.y1),
             camera.world_to_screen(GAME_WIDTH, self.y2),
-            8
+            12
         )

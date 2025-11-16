@@ -130,23 +130,48 @@ class Ball:
         screen_x, screen_y = camera.world_to_screen(self.x, self.y)
         current_radius = self._get_current_radius()
 
-        if current_radius > 0:
-            # 绘制小球主体
-            pygame.draw.circle(screen, (50, 200, 50), (int(screen_x), int(screen_y)), int(current_radius))
+        if current_radius <= 0:
+            return
 
-            # 如果正在滚入，添加旋转效果（通过绘制一个高光点）
-            if self.is_falling_into_hole:
-                # 根据进度计算高光位置（模拟旋转）
-                angle = self.fall_animation_progress * 10  # 旋转角度
-                highlight_x = screen_x + math.cos(angle) * current_radius * 0.6
-                highlight_y = screen_y + math.sin(angle) * current_radius * 0.6
-                highlight_color = (100, 255, 100)
-                pygame.draw.circle(screen, highlight_color, (int(highlight_x), int(highlight_y)),
-                                   int(current_radius * 0.3))
-            else:
-                # 正常状态的高光
-                highlight_x = screen_x - current_radius * 0.4
-                highlight_y = screen_y - current_radius * 0.4
-                highlight_color = (100, 255, 100)
-                pygame.draw.circle(screen, highlight_color, (int(highlight_x), int(highlight_y)),
-                                   int(current_radius * 0.3))
+        # === 铜色渐变主体 ===
+        base_color = (184, 115, 51)  # 铜色 (可调暖)
+        mid_color = (205, 135, 70)  # 中间亮一点
+        light_color = (240, 180, 120)  # 高光色
+
+        # 主体：深铜色
+        pygame.draw.circle(
+            screen, base_color,
+            (int(screen_x), int(screen_y)),
+            int(current_radius)
+        )
+
+        # 第二层：略小一点的浅铜色，让球体更有体积
+        pygame.draw.circle(
+            screen, mid_color,
+            (int(screen_x), int(screen_y)),
+            int(current_radius * 0.8)
+        )
+
+        # === 高光（关键，决定金属感）===
+        if self.is_falling_into_hole:
+            angle = self.fall_animation_progress * 12
+        else:
+            angle = (self.x + self.y) * 0.05  # 普通旋转感
+
+        hx = screen_x + math.cos(angle) * current_radius * 0.4
+        hy = screen_y + math.sin(angle) * current_radius * 0.4
+
+        pygame.draw.circle(
+            screen,
+            light_color,
+            (int(hx), int(hy)),
+            int(current_radius * 0.28)
+        )
+
+        # 内部更亮的点，强化金属感
+        pygame.draw.circle(
+            screen,
+            (255, 220, 180),
+            (int(hx), int(hy)),
+            int(current_radius * 0.15)
+        )
