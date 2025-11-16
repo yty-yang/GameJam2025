@@ -1,4 +1,5 @@
 from pathlib import Path
+import math
 
 import pygame
 
@@ -81,26 +82,40 @@ class ShopScene(Scene):
             pass
 
     def update(self, dt):
-        if self.beer_state == "fadein":
-            self.beer_alpha += 200 * dt  # 0.2 秒淡入
-            if self.beer_alpha >= 255:
-                self.beer_alpha = 255
-                self.beer_state = "hold"
-                self.beer_timer = 0
-
-        elif self.beer_state == "hold":
+        # 啤酒动画（摇晃 + 闪光）
+        if self.beer_state in ("fadein", "hold", "fadeout"):
             self.beer_timer += dt
-            if self.beer_timer >= 0.6:  # 停留 0.6 秒
-                self.beer_state = "fadeout"
 
-        elif self.beer_state == "fadeout":
-            self.beer_alpha -= 200 * dt  # 0.2 秒淡出
-            if self.beer_alpha <= 0:
-                self.beer_alpha = 0
-                self.beer_state = None
-                self.next_scene = "menu"
+            # 上下浮动: sin 波动
+            self.beer_float_offset = math.sin(self.beer_timer * 6) * 8  # 上下 ±8px
+
+            # 左右轻微摇晃
+            self.beer_shake_offset = math.sin(self.beer_timer * 12) * 4  # 左右 ±4px
+
+            # 闪光：淡入阶段轻微闪烁（不是很闪眼）
+            if self.beer_state == "fadein":
+                flash = (math.sin(self.beer_timer * 20) + 1) * 0.1  # 0 ~ 0.2
+                self.beer_alpha = min(255, self.beer_alpha + (200 * dt) + flash * 255)
+
+            elif self.beer_state == "hold":
+                self.beer_alpha = 255
+
+            elif self.beer_state == "fadeout":
+                self.beer_alpha -= 200 * dt
+                if self.beer_alpha <= 0:
+                    self.beer_alpha = 0
+                    self.beer_state = None
+                    self.next_scene = "menu"
 
     def draw(self, screen):
+        # 顶部 HUD 条
+        pygame.draw.rect(screen, (20, 20, 20), (0, 0, SCREEN_WIDTH, 40))
+        pygame.draw.rect(screen, (200, 200, 200), (0, 0, SCREEN_WIDTH, 40), 3)
+
+        hud_text = f"Coins: {GAME_STATE['total_coins']}    Beer: {GAME_STATE['beer']}"
+        hud_surface = self.font.render(hud_text, True, (255, 255, 0))
+        screen.blit(hud_surface, (20, 6))
+
         screen.blit(self.background, (0, 0))
 
         if self.show_beer_prompt:
@@ -113,8 +128,14 @@ class ShopScene(Scene):
             box_w, box_h = SCREEN_WIDTH, 120
             box_x = 0
             box_y = SCREEN_HEIGHT - box_h
-            pygame.draw.rect(screen, (50, 50, 50, 180), (box_x, box_y, box_w, box_h))
-            pygame.draw.rect(screen, (200, 200, 200), (box_x, box_y, box_w, box_h), 2)
+            # 像素底框 (深灰)
+            pygame.draw.rect(screen, (30, 30, 30), (box_x, box_y, box_w, box_h))
+
+            # 内框 (稍亮灰)
+            pygame.draw.rect(screen, (80, 80, 80), (box_x + 4, box_y + 4, box_w - 8, box_h - 8), 3)
+
+            # 外框 (亮色)
+            pygame.draw.rect(screen, (220, 220, 220), (box_x, box_y, box_w, box_h), 4)
 
             # 文本
             prompt_surface = self.font.render("Do you want a beer ( 5 coins )", True, (255, 255, 255))
@@ -127,15 +148,24 @@ class ShopScene(Scene):
                 color = (255, 255, 0) if i == self.beer_choice_index else (255, 255, 255)
                 text_surface = self.font.render(option, True, color)
                 text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2 - 60 + i * 120, box_y + 80))
+
+                # 选中的用像素框框住
+                if i == self.beer_choice_index:
+                    pygame.draw.rect(screen, (255, 255, 0), text_rect.inflate(20, 10), 2)
+
                 screen.blit(text_surface, text_rect)
         else:
             # 可以绘制 Shop 主界面内容
             info_surface = self.font.render("Welcome to the Shop!", True, (200, 200, 255))
             screen.blit(info_surface, (SCREEN_WIDTH // 2 - info_surface.get_width() // 2, SCREEN_HEIGHT // 2))
 
-        # 啤酒淡入淡出效果
+        # 啤酒淡入淡出 + 摇晃动画
         if self.beer_state is not None:
             temp = self.beer_img.copy()
             temp.set_alpha(int(self.beer_alpha))
-            rect = temp.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+
+            cx = SCREEN_WIDTH // 2 + getattr(self, "beer_shake_offset", 0)
+            cy = SCREEN_HEIGHT // 2 + getattr(self, "beer_float_offset", 0)
+
+            rect = temp.get_rect(center=(cx, cy))
             screen.blit(temp, rect)
