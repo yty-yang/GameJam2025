@@ -25,9 +25,11 @@ COIN_RADIUS = 12
 GAME_STATE = {
     "pass_count": 0,
     "play_count": 0,
-    "total_coins": 0,
     "coins": 0,
     "score": 0,
+
+    "beer": 0,
+
     "victory": False,
     "volume": 5,
     "vibration": True

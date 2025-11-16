@@ -193,7 +193,7 @@ class UI:
             f"PASS COUNT: {GAME_STATE['pass_count']}",
             f"PLAY COUNT: {GAME_STATE['play_count']}",
             f"HIGHEST SCORE: {GAME_STATE['highest_score']}",
-            f"COINS: {GAME_STATE['total_coins']}"
+            f"COINS: {GAME_STATE['coins']}"
         ]
 
         # 行间距更紧凑
@@ -204,3 +204,9 @@ class UI:
         for i, text in enumerate(state_texts):
             text_surface = self.font.render(text, True, state_color)
             screen.blit(text_surface, (base_x, base_y + i * line_height))
+
+        # ----------- 右上角显示 Beer 数量 -----------
+        beer_text = f"BEER: {GAME_STATE['beer']}"
+        text_surface = self.font.render(beer_text, True, (255, 180, 50))  # 金黄色
+        text_rect = text_surface.get_rect(topright=(SCREEN_WIDTH - 40, 40))  # 右上角
+        screen.blit(text_surface, text_rect)

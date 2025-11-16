@@ -13,6 +13,7 @@ from core.scenes.main_menu.menuScene import MenuScene
 from core.scenes.main_menu.modeScene import ModeScene
 from core.scenes.main_menu.selectScene import SelectScene
 from core.scenes.main_menu.settingScene import SettingScene
+from core.scenes.main_menu.shopScene import ShopScene
 from core.sound import sound_manager
 from utils.settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_STATE
 
@@ -31,7 +32,8 @@ def game_state_load():
 
     # 如果文件不存在或为空，就创建默认数据
     if not data_path.exists() or data_path.stat().st_size == 0:
-        data = {"pass_count": 0, "play_count": 0, "highest_score": 0, "total_coins": 0, "volume": 5, "vibration": True}
+        data = {"pass_count": 0, "play_count": 0, "highest_score": 0, "coins": 0, "beer": 0, "volume": 5,
+                "vibration": True}
         with data_path.open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     else:
@@ -40,16 +42,19 @@ def game_state_load():
                 data = json.load(f)
         except json.JSONDecodeError:
             # 文件内容损坏时也用默认值重建
-            data = {"pass_count": 0, "play_count": 0, "highest_score": 0, "total_coins": 0, "volume": 5, "vibration": True}
+            data = {"pass_count": 0, "play_count": 0, "highest_score": 0, "coins": 0, "beer": 0, "volume": 5,
+                    "vibration": True}
             with data_path.open("w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
     GAME_STATE["pass_count"] = data.get("pass_count", 0)
     GAME_STATE["play_count"] = data.get("play_count", 0)
     GAME_STATE["highest_score"] = data.get("highest_score", 0)
-    GAME_STATE["total_coins"] = data.get("total_coins", 0)
+    GAME_STATE["coins"] = data.get("coins", 0)
+    GAME_STATE["beer"] = data.get("beer", 0)
     GAME_STATE["volume"] = data.get("volume", 5)
     GAME_STATE["vibration"] = data.get("vibration", True)
+
 
 def scene_switch(current_scene):
     if current_scene.next_scene == "menu":
@@ -58,10 +63,12 @@ def scene_switch(current_scene):
         current_scene = ModeScene()
     elif current_scene.next_scene == "help":
         current_scene = HelpScene()
-    elif current_scene.next_scene == "credits":
-        current_scene = CreditsScene()
+    elif current_scene.next_scene == "shop":
+        current_scene = ShopScene()
     elif current_scene.next_scene == "setting":
         current_scene = SettingScene()
+    elif current_scene.next_scene == "credits":
+        current_scene = CreditsScene()
     elif current_scene.next_scene == "select":
         current_scene = SelectScene()
     elif current_scene.next_scene == "endless":
