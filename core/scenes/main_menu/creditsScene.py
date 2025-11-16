@@ -84,7 +84,7 @@ class CreditsScene(Scene):
                 current_y += 30
 
         # 绘制返回提示
-        hint_text = self.small_font.render("Press SPACE or ESC to return", True, (150, 150, 200))
+        hint_text = self.small_font.render("Press ENTER to return", True, (150, 150, 200))
         hint_rect = hint_text.get_rect(center=(screen.get_width() // 2, screen.get_height() - 30))
         screen.blit(hint_text, hint_rect)
 
