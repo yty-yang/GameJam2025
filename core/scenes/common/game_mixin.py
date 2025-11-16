@@ -313,8 +313,7 @@ class GameMixin(Scene, GameMachineMixin):
                 platform_moved = True
             if self.joystick:
                 ly = self.joystick.get_axis(1)  # 左摇杆Y轴
-                n = 4 if sys.platform.startswith("win") else 3
-                ry = self.joystick.get_axis(n)  # 右摇杆Y轴
+                ry = self.joystick.get_axis(3)  # 右摇杆Y轴
 
                 if ly < -0.2:  # 左摇杆上推
                     self.platform.move(True, False, True, speed_factor=min(1.0, -ly))
