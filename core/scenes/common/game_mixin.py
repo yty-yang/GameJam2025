@@ -180,7 +180,7 @@ class GameMixin(Scene, GameMachineMixin):
                 if platform.check_collision(self.ball):
                     # 小球撞到移动平台，轻微反弹
                     self.ball.vy = -abs(self.ball.vy) * 0.3
-                    self.shake_timer = 3
+                    self.shake_timer = 10
 
         if hasattr(self, "springs"):
             for spring in self.springs:
@@ -191,7 +191,7 @@ class GameMixin(Scene, GameMachineMixin):
                     
                     # 弹簧弹跳
                     self.ball.vy = -spring.bounce_power
-                    self.shake_timer = 5
+                    self.shake_timer = 20
 
         if hasattr(self, "teleporters"):
             teleported = False  # 防止同一帧内多次传送
@@ -210,7 +210,7 @@ class GameMixin(Scene, GameMachineMixin):
                             self.ball.x, self.ball.y = tele_target
                             self.ball.vx *= 0.5
                             self.ball.vy *= 0.5
-                            self.shake_timer = 2
+                            self.shake_timer = 30
                             # 设置传送冷却时间（0.5秒，防止立即传回）
                             self.ball.teleport_cooldown = 0.5
                             teleported = True
@@ -223,7 +223,7 @@ class GameMixin(Scene, GameMachineMixin):
                     coin.collect()
                     self.coins_collected += 1
                     self.score += 50
-                    self.shake_timer = 2
+                    self.shake_timer = 10
 
     def _fall_into_hole_func(self):
         for hole in self.holes:
@@ -485,6 +485,7 @@ class GameMixin(Scene, GameMachineMixin):
             if self.beer:
                 GAME_STATE["slow_time"] = True
                 self.beer_timer -= dt  # dt 是本帧经过的秒数
+                self.shake_timer = 50
                 if self.beer_timer <= 0:
                     self.beer = False
                     self.beer_timer = 0
