@@ -91,6 +91,14 @@ class GameMixin(Scene, GameMachineMixin):
         except Exception as e:
             print(f"无法预加载弹簧音效: {e}")
         
+        # 预加载传送音效
+        try:
+            teleportation_path = project_root / "data" / "sounds" / "teleportation.mp3"
+            if teleportation_path.exists():
+                sound_manager.load_sound("teleportation", str(teleportation_path))
+        except Exception as e:
+            print(f"无法预加载传送音效: {e}")
+        
         # 预加载小球滚动音效
         try:
             ball_roll_path = project_root / "data" / "sounds" / "ball_roll.mp3"
@@ -192,6 +200,9 @@ class GameMixin(Scene, GameMachineMixin):
                     if not teleported:
                         tele_target = teleporter.check_collision(self.ball)
                         if tele_target:
+                            # 播放传送音效
+                            sound_manager.play_sound("teleportation")
+                            
                             # 传送
                             self.ball.x, self.ball.y = tele_target
                             self.ball.vx *= 0.5
