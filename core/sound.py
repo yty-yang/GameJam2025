@@ -32,7 +32,6 @@ class SoundManager:
             try:
                 pygame.mixer.music.load(str(self.music_file))
                 pygame.mixer.music.set_volume(self.volume)
-                print(f"音乐文件加载成功: {self.music_file}")
             except pygame.error as e:
                 print(f"加载音乐文件失败: {e}")
 
@@ -45,7 +44,6 @@ class SoundManager:
             try:
                 pygame.mixer.music.play(-1 if loop else 0)
                 self.is_playing = True
-                print(f"开始播放音乐: {self.music_file}")
             except pygame.error as e:
                 print(f"播放音乐失败: {e}")
         else:

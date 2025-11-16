@@ -23,7 +23,8 @@ COIN_RADIUS = 12
 
 # 游戏状态（用于场景间传递数据）
 GAME_STATE = {
-    "highest_score": 0,
+    "pass_count": 0,
+    "play_count": 0,
     "total_coins": 0,
     "coins": 0,
     "score": 0,

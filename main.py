@@ -6,6 +6,7 @@ import pygame
 from core.scenes.gameplay.endlessScene import EndlessScene
 from core.scenes.gameplay.gameoverScene import GameoverScene
 from core.scenes.gameplay.levelScene import LevelScene
+from core.scenes.gameplay.levelendScene import LevelendScene
 from core.scenes.main_menu.creditsScene import CreditsScene
 from core.scenes.main_menu.helpScene import HelpScene
 from core.scenes.main_menu.menuScene import MenuScene
@@ -30,7 +31,7 @@ def game_state_load():
 
     # 如果文件不存在或为空，就创建默认数据
     if not data_path.exists() or data_path.stat().st_size == 0:
-        data = {"highest_score": 0, "total_coins": 0, "volume": 5, "vibration": True}
+        data = {"pass_count": 0, "play_count": 0, "highest_score": 0, "total_coins": 0, "volume": 5, "vibration": True}
         with data_path.open("w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
     else:
@@ -39,10 +40,12 @@ def game_state_load():
                 data = json.load(f)
         except json.JSONDecodeError:
             # 文件内容损坏时也用默认值重建
-            data = {"highest_score": 0, "total_coins": 0, "volume": 5, "vibration": True}
+            data = {"pass_count": 0, "play_count": 0, "highest_score": 0, "total_coins": 0, "volume": 5, "vibration": True}
             with data_path.open("w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
 
+    GAME_STATE["pass_count"] = data.get("pass_count", 0)
+    GAME_STATE["play_count"] = data.get("play_count", 0)
     GAME_STATE["highest_score"] = data.get("highest_score", 0)
     GAME_STATE["total_coins"] = data.get("total_coins", 0)
     GAME_STATE["volume"] = data.get("volume", 5)
@@ -65,6 +68,10 @@ def scene_switch(current_scene):
         current_scene = EndlessScene()
     elif current_scene.next_scene == "gameover":
         current_scene = GameoverScene()
+    elif current_scene.next_scene == "level_win":
+        current_scene = LevelendScene(True)
+    elif current_scene.next_scene == "level_lose":
+        current_scene = LevelendScene(False)
     else:
         for i in range(1, 4):
             for j in range(1, 4):
@@ -101,7 +108,7 @@ class IntroScene:
         if self.music_file:
             sound_manager.set_music_file(self.music_file)
             sound_manager.play_music(loop=-1)  # 循环播放
-            self.max_volume = sound_manager.volume
+            self.max_volume = GAME_STATE["volume"] / 10.0
             sound_manager.set_volume(0)  # 初始静音
 
     def handle_events(self, events):
@@ -149,6 +156,7 @@ def main():
 
     game_state_load()
     sound_manager.set_music_file("data/sounds/background.mp3")
+    sound_manager.set_volume(GAME_STATE["volume"] / 10.0)
     sound_manager.play_music()
 
     # ======== 开场淡入 + 音乐渐入 + 显示 + 淡出 ========

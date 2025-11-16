@@ -135,13 +135,13 @@ class LevelScene(GameMixin):
             if level_num == 1 or level_num == 2:
                 self.next_scene_after_dialog = f"level_{level_num + 1}_{self.life}"
             else:
-                self.next_scene_after_dialog = "menu"
+                self.next_scene_after_dialog = "level_win"
         else:
             sound_manager.play_sound("game_over")
 
             dialog_path = project_root / "data" / "pictures" / "dialogs" / f"gameover_{level_num}.png"
             self.dialog_image = pygame.image.load(dialog_path).convert_alpha()
-            self.next_scene_after_dialog = f"level_{level_num}_{self.life - 1}" if self.life > 1 else "menu"
+            self.next_scene_after_dialog = f"level_{level_num}_{self.life - 1}" if self.life > 1 else "level_lose"
 
     def _compute_progress(self):
         total_distance = abs(self.start_y - self.finish_line.y)

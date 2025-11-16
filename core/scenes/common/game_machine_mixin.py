@@ -43,7 +43,6 @@ class GameMachineMixin:
                     self.game_machine_frames = None
             else:
                 self.game_machine_bg = None  # 使用动画帧时不需要单个背景
-                print(f"成功加载 {len(self.game_machine_frames)} 帧游戏机背景动画")
 
             # 游戏区域：1:1 正方形，左右居中，上下贴顶
             # 游戏区域宽度等于高度（正方形），不被缩放
