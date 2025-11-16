@@ -1,6 +1,7 @@
 import json
-import pygame
 from pathlib import Path
+
+import pygame
 
 from core.scenes.common.game_mixin import GameMixin
 from core.scenes.common.menu_navigation_mixin import confirm_pressed
@@ -55,8 +56,6 @@ class LevelScene(GameMixin):
             self.intro_image = pygame.image.load(intro_path).convert_alpha()
             self.show_intro = True
 
-
-
     def _init_obj(self, level_data):
         # 初始化终点线
 
@@ -78,7 +77,8 @@ class LevelScene(GameMixin):
         obstacles = level_data.get("obstacles", [])
         for obstacle in obstacles:
             if obstacle["type"] == "moving_platform":
-                platform = MovingPlatform(obstacle["x"], obstacle["y"], obstacle["direction"])
+                platform = MovingPlatform(obstacle["x"], obstacle["y"], width=obstacle["width"],
+                                          height=obstacle["height"], direction=obstacle["direction"])
                 self.moving_platforms.append(platform)
             elif obstacle["type"] == "spring":
                 spring = Spring(obstacle["x"], obstacle["y"])
@@ -86,8 +86,10 @@ class LevelScene(GameMixin):
             elif obstacle["type"] == "teleporterPair":
                 # 创建配对传送门，使用配对ID区分不同的传送门对
                 pair_id = len(self.teleporters)  # 每个传送门对使用不同的ID
-                teleporter1 = Teleporter(obstacle["x1"], obstacle["y1"], obstacle["x2"], obstacle["y2"], pair_id=pair_id)
-                teleporter2 = Teleporter(obstacle["x2"], obstacle["y2"], obstacle["x1"], obstacle["y1"], pair_id=pair_id)
+                teleporter1 = Teleporter(obstacle["x1"], obstacle["y1"], obstacle["x2"], obstacle["y2"],
+                                         pair_id=pair_id)
+                teleporter2 = Teleporter(obstacle["x2"], obstacle["y2"], obstacle["x1"], obstacle["y1"],
+                                         pair_id=pair_id)
                 # 设置配对引用
                 teleporter1.pair_teleporter = teleporter2
                 teleporter2.pair_teleporter = teleporter1
