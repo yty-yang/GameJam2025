@@ -31,4 +31,4 @@ python main.py
 ```
 ## Welcome to Sat 19, Ladies and Gentlemen ！！！
 
-![30d3368b434711a5169a285b5a205884](https://github.com/user-attachments/assets/9d25aff5-06fb-46d9-8d9b-a1bdacfda47c)
+![menu](./menu_picture.png)
