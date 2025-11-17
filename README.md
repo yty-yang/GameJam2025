@@ -29,6 +29,7 @@ Guide your ball through treacherous obstacles to reach the legendary "Glacier's 
 ```bash
 python main.py
 ```
-## Welcome to Sat 19, Ladies and Gentlemen ！！！
+## Welcome to Sat 19, Ladies and Gentlemen !!!
 
 ![menu](./menu_picture.png)
+![game-scene](./game-scene.png)
